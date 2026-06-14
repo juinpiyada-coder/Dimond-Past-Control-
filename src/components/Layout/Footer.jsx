@@ -8,7 +8,9 @@ const Footer = () => {
     <footer className="footer">
       <div className="container footer-container">
         <div className="footer-section">
-          <h3 className="footer-title">Dimond Pest Control</h3>
+          <div className="footer-logo">
+            <img src="/logo.png" alt="Diamond Pest Control Logo" className="logo-img-footer" />
+          </div>
           <p className="footer-text">
             Professional and reliable pest control services for your home and business. Your safety is our priority.
           </p>
