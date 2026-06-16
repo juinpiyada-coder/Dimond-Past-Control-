@@ -325,7 +325,7 @@ const Home = () => {
                 <div 
                   key={idx} 
                   className="testimonial-card shadow-lg"
-                  style={{ minWidth: '350px', maxWidth: '400px', whiteSpace: 'normal', flexShrink: 0 }}
+                  style={{ minWidth: 'min(100vw - 40px, 350px)', maxWidth: '400px', whiteSpace: 'normal', flexShrink: 0 }}
                 >
                   <Quote size={40} className="quote-icon opacity-20" />
                   <p className="testimonial-text">"{t.text}"</p>

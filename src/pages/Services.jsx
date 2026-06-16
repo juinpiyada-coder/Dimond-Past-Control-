@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Leaf, ShieldAlert, Clock, Bug } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { mockServices } from '../utils/mockData';
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -11,13 +12,16 @@ const Services = () => {
     fetch('http://localhost:8000/api/services')
       .then(r => r.json())
       .then(data => {
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && data.length > 0) {
           setServices(data);
+        } else {
+          setServices(mockServices);
         }
         setLoading(false);
       })
       .catch(err => {
         console.error("Failed to fetch services", err);
+        setServices(mockServices);
         setLoading(false);
       });
   }, []);
@@ -119,7 +123,7 @@ const Services = () => {
           ) : (
             <motion.div 
               className="services-grid"
-              style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}
+              style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))' }}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-50px" }}

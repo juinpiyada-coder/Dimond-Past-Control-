@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Shield, Bug } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { mockServices } from '../utils/mockData';
 
 const ServiceDetails = () => {
   const { name } = useParams();
@@ -13,14 +14,20 @@ const ServiceDetails = () => {
     fetch('http://localhost:8000/api/services')
       .then(r => r.json())
       .then(data => {
-        if (Array.isArray(data)) {
-          const foundService = data.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
-          setService(foundService);
+        let foundService = null;
+        if (Array.isArray(data) && data.length > 0) {
+          foundService = data.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
         }
+        if (!foundService) {
+          foundService = mockServices.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
+        }
+        setService(foundService);
         setLoading(false);
       })
       .catch(err => {
         console.error("Failed to fetch services", err);
+        const foundService = mockServices.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
+        setService(foundService);
         setLoading(false);
       });
   }, [name]);
@@ -68,7 +75,7 @@ const ServiceDetails = () => {
 
       {/* Content Section */}
       <div className="container section-padding">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '50px', alignItems: 'flex-start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '50px', alignItems: 'flex-start' }}>
           
           {/* Image Column */}
           <motion.div 
