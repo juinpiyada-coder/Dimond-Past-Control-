@@ -39,7 +39,7 @@ const Header = () => {
           align-items: center;
           padding: 10px 20px;
           gap: 20px;
-          height: 65px;
+          min-height: 80px;
         }
         .amz-logo-link {
           display: flex;
@@ -52,7 +52,7 @@ const Header = () => {
           border-color: white;
         }
         .amz-logo-img {
-          height: 40px;
+          height: 55px;
           object-fit: contain;
         }
         .amz-search-bar {
@@ -122,6 +122,11 @@ const Header = () => {
           overflow-x: auto;
           white-space: nowrap;
           height: 40px;
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .amz-nav-main::-webkit-scrollbar {
+          display: none;
         }
         .amz-bottom-link {
           padding: 8px 10px;
@@ -191,7 +196,7 @@ const Header = () => {
             max-width: 60%;
           }
           .amz-logo-img {
-            height: 35px;
+            height: 45px;
           }
           .amz-search-bar {
             order: 3;

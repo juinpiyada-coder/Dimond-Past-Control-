@@ -11,7 +11,8 @@ const ServiceDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/services')
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    fetch(`${apiUrl}/services`)
       .then(r => r.json())
       .then(data => {
         let foundService = null;

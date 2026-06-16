@@ -9,7 +9,8 @@ const Services = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/services')
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    fetch(`${apiUrl}/services`)
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
@@ -41,13 +42,13 @@ const Services = () => {
       {/* Page Header */}
       <div className="page-header">
         <div className="container">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             Our Pest Control Services
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -62,8 +63,8 @@ const Services = () => {
       <section className="section-padding bg-light">
         <div className="container">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', alignItems: 'center' }}>
-            
-            <motion.div 
+
+            <motion.div
               style={{ flex: '1 1 500px' }}
               initial="hidden"
               whileInView="visible"
@@ -80,8 +81,8 @@ const Services = () => {
                 Whether it’s protecting homes, ensuring compliance for businesses, or safeguarding large facilities, we provide actionable insights and structured plans that deliver measurable results. With our consultative approach, you don’t just get a service—you gain a trusted partner committed to your success.
               </motion.p>
             </motion.div>
-            
-            <motion.div 
+
+            <motion.div
               style={{ flex: '1 1 400px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}
               initial="hidden"
               whileInView="visible"
@@ -93,13 +94,13 @@ const Services = () => {
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '10px', color: '#166534' }}>Eco friendly technologies</h3>
                 <p style={{ color: '#15803d', fontSize: '0.9rem' }}>Safe for families, pets, and the environment</p>
               </motion.div>
-              
+
               <motion.div variants={fadeInUp} style={{ padding: '25px', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', textAlign: 'center' }}>
                 <Clock style={{ color: '#2563eb', width: '40px', height: '40px', margin: '0 auto 15px' }} />
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '10px', color: '#1e40af' }}>Fast Pest Removal</h3>
                 <p style={{ color: '#1d4ed8', fontSize: '0.9rem' }}>Quick solutions when you need them most</p>
               </motion.div>
-              
+
               <motion.div variants={fadeInUp} style={{ padding: '25px', backgroundColor: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '12px', textAlign: 'center', gridColumn: '1 / -1' }}>
                 <ShieldAlert style={{ color: '#ea580c', width: '40px', height: '40px', margin: '0 auto 15px' }} />
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '10px', color: '#9a3412' }}>One-time extermination</h3>
@@ -115,13 +116,13 @@ const Services = () => {
       <section className="section-padding">
         <div className="container">
           <h2 className="section-title">Our Services</h2>
-          
+
           {loading ? (
             <div style={{ textAlign: 'center', padding: '50px' }}>
               <p>Loading services...</p>
             </div>
           ) : (
-            <motion.div 
+            <motion.div
               className="services-grid"
               style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))' }}
               initial="hidden"
@@ -130,8 +131,8 @@ const Services = () => {
               variants={staggerContainer}
             >
               {services.map((service, index) => (
-                <motion.div 
-                  key={service.service_id || index} 
+                <motion.div
+                  key={service.service_id || index}
                   variants={fadeInUp}
                   whileHover={{ y: -8 }}
                   style={{ backgroundColor: 'var(--bg-white)', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)', display: 'flex', flexDirection: 'column' }}
@@ -139,9 +140,9 @@ const Services = () => {
                   {/* Real Backend Connect Image */}
                   <div style={{ height: '200px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                     {service.service_image ? (
-                      <img 
-                        src={service.service_image} 
-                        alt={service.service_name} 
+                      <img
+                        src={service.service_image}
+                        alt={service.service_name}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                     ) : (
@@ -151,13 +152,13 @@ const Services = () => {
                       </div>
                     )}
                   </div>
-                  
+
                   <div style={{ padding: '30px 25px', display: 'flex', flexDirection: 'column', flexGrow: 1, backgroundColor: 'var(--primary)', textAlign: 'center', alignItems: 'center' }}>
                     <h3 style={{ fontSize: '1.4rem', color: 'var(--text-dark)', marginBottom: '15px', fontWeight: 700 }}>{service.service_name}</h3>
                     <p style={{ color: 'var(--text-dark)', marginBottom: '25px', flexGrow: 1, lineHeight: 1.6, fontSize: '1.05rem', fontWeight: 400 }}>
                       {service.description || "Comprehensive pest control treatment ensuring a safe environment."}
                     </p>
-                    <Link 
+                    <Link
                       to={`/service/${encodeURIComponent(service.service_name)}`}
                       className="btn btn-secondary"
                       style={{ marginTop: 'auto', padding: '12px 30px', fontSize: '1.1rem' }}
