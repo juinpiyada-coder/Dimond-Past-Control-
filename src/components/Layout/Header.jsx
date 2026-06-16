@@ -184,36 +184,37 @@ const Header = () => {
 
         @media (max-width: 768px) {
           :root {
-            --header-height: 140px !important;
+            --header-height: 110px !important;
           }
           .amz-nav-belt {
             flex-wrap: wrap;
-            padding: 8px 10px;
+            padding: 10px 15px;
             height: auto;
           }
           .amz-logo-link {
             padding: 0;
-            max-width: 60%;
+            max-width: 70%;
           }
           .amz-logo-img {
-            height: 45px;
+            height: 55px; /* Make logo bigger */
           }
           .amz-search-bar {
             order: 3;
             width: 100%;
-            margin-top: 8px;
-            height: 38px;
+            margin-top: 10px;
+            height: 42px;
           }
           .amz-nav-tools {
-            gap: 2px;
+            gap: 10px;
             margin-left: auto;
           }
           .amz-nav-item {
             padding: 4px;
           }
           .amz-cart-btn {
-            height: 35px;
-            padding: 0 12px !important;
+            height: 38px;
+            padding: 0 15px !important;
+            border-radius: 6px;
           }
           .desktop-only {
             display: none !important;
@@ -221,17 +222,16 @@ const Header = () => {
           .mobile-only {
             display: flex;
           }
+          .amz-nav-main {
+            display: none !important; /* Hide ugly scroll menu on mobile */
+          }
         }
         @media (max-width: 480px) {
           :root {
-            --header-height: 130px !important;
+            --header-height: 105px !important;
           }
-          .amz-nav-main {
-            padding: 5px 10px;
-          }
-          .amz-bottom-link {
-            font-size: 0.85rem;
-            padding: 6px 8px;
+          .amz-logo-img {
+            height: 50px;
           }
         }
       `}</style>
