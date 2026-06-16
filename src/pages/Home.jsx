@@ -8,12 +8,17 @@ import { FaBed } from 'react-icons/fa';
 import { mockServices } from '../utils/mockData';
 
 const Home = () => {
-  const [services, setServices] = useState([]);
+  const [services, setServices] = useState(mockServices);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Force hide loader after 300ms no matter what
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 300);
+
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     if (apiUrl) {
       fetch(`${apiUrl}/services`)
@@ -21,22 +26,18 @@ const Home = () => {
         .then(data => {
           if (Array.isArray(data) && data.length > 0) {
             setServices(data);
-          } else {
-            setServices(mockServices);
           }
+          clearTimeout(timer);
           setLoading(false);
         })
         .catch(err => {
           console.error("Failed to fetch services", err);
-          setServices(mockServices);
+          clearTimeout(timer);
           setLoading(false);
         });
-    } else {
-      setTimeout(() => {
-        setServices(mockServices);
-        setLoading(false);
-      }, 400);
     }
+
+    return () => clearTimeout(timer);
   }, []);
 
   const pestCategories = [

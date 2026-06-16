@@ -15,11 +15,15 @@ const ServiceDetails = () => {
     s.service_name.toLowerCase() === decodedName.replace(' control', '')
   ) || mockServices[0]; // Fallback to first mock service so there's never a delay
 
-  const [service, setService] = useState(null);
+  const [service, setService] = useState(initialService);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
+    // Force hide loader after 300ms no matter what
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 300);
+
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     if (apiUrl) {
       fetch(`${apiUrl}/services`)
@@ -29,25 +33,20 @@ const ServiceDetails = () => {
           if (Array.isArray(data) && data.length > 0) {
             foundService = data.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
           }
-          if (!foundService) {
-            foundService = mockServices.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
+          if (foundService) {
+            setService(foundService);
           }
-          setService(foundService);
+          clearTimeout(timer);
           setLoading(false);
         })
         .catch(err => {
           console.error("Failed to fetch services", err);
-          const foundService = mockServices.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
-          setService(foundService);
+          clearTimeout(timer);
           setLoading(false);
         });
-    } else {
-      setTimeout(() => {
-        const foundService = mockServices.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
-        setService(foundService);
-        setLoading(false);
-      }, 400);
     }
+
+    return () => clearTimeout(timer);
   }, [name]);
 
   if (loading) {
