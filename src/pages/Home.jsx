@@ -8,23 +8,35 @@ import { FaBed } from 'react-icons/fa';
 import { mockServices } from '../utils/mockData';
 
 const Home = () => {
-  const [services, setServices] = useState(mockServices);
-  const [loading, setLoading] = useState(false);
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-    fetch(`${apiUrl}/services`)
-      .then(r => r.json())
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setServices(data);
-        }
-      })
-      .catch(err => {
-        console.error("Failed to fetch services", err);
-      });
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
+    if (apiUrl) {
+      fetch(`${apiUrl}/services`)
+        .then(r => r.json())
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            setServices(data);
+          } else {
+            setServices(mockServices);
+          }
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error("Failed to fetch services", err);
+          setServices(mockServices);
+          setLoading(false);
+        });
+    } else {
+      setTimeout(() => {
+        setServices(mockServices);
+        setLoading(false);
+      }, 400);
+    }
   }, []);
 
   const pestCategories = [
@@ -170,7 +182,7 @@ const Home = () => {
             services.slice(0, 5).map((service, idx) => (
               <div key={idx} className="fk-deal-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
                 <img 
-                  src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')} 
+                  src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')} 
                   alt={service.service_name} 
                   className="fk-deal-card-img" 
                   onError={(e) => { e.target.onerror = null; e.target.src = '/logo.png'; }}
@@ -194,7 +206,7 @@ const Home = () => {
             <div key={idx} className="fk-suggested-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
               <div className="fk-suggested-card-img-wrapper">
                 <img 
-                  src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')} 
+                  src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')} 
                   alt={service.service_name} 
                   className="fk-suggested-card-img"
                   onError={(e) => { e.target.onerror = null; e.target.src = '/logo.png'; }}

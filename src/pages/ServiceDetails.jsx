@@ -15,25 +15,39 @@ const ServiceDetails = () => {
     s.service_name.toLowerCase() === decodedName.replace(' control', '')
   ) || mockServices[0]; // Fallback to first mock service so there's never a delay
 
-  const [service, setService] = useState(initialService);
-  const [loading, setLoading] = useState(false);
+  const [service, setService] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-    fetch(`${apiUrl}/services`)
-      .then(r => r.json())
-      .then(data => {
-        let foundService = null;
-        if (Array.isArray(data) && data.length > 0) {
-          foundService = data.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
-        }
-        if (foundService) {
+    setLoading(true);
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
+    if (apiUrl) {
+      fetch(`${apiUrl}/services`)
+        .then(r => r.json())
+        .then(data => {
+          let foundService = null;
+          if (Array.isArray(data) && data.length > 0) {
+            foundService = data.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
+          }
+          if (!foundService) {
+            foundService = mockServices.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
+          }
           setService(foundService);
-        }
-      })
-      .catch(err => {
-        console.error("Failed to fetch services", err);
-      });
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error("Failed to fetch services", err);
+          const foundService = mockServices.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
+          setService(foundService);
+          setLoading(false);
+        });
+    } else {
+      setTimeout(() => {
+        const foundService = mockServices.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
+        setService(foundService);
+        setLoading(false);
+      }, 400);
+    }
   }, [name]);
 
   if (loading) {
