@@ -7,8 +7,16 @@ import { mockServices } from '../utils/mockData';
 const ServiceDetails = () => {
   const { name } = useParams();
   const navigate = useNavigate();
-  const [service, setService] = useState(null);
-  const [loading, setLoading] = useState(true);
+  
+  const decodedName = decodeURIComponent(name).toLowerCase();
+  const initialService = mockServices.find(s => 
+    s.service_name.toLowerCase() === decodedName ||
+    s.service_name.toLowerCase() === decodedName.replace(' treatment', '') ||
+    s.service_name.toLowerCase() === decodedName.replace(' control', '')
+  ) || mockServices[0]; // Fallback to first mock service so there's never a delay
+
+  const [service, setService] = useState(initialService);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
@@ -19,17 +27,12 @@ const ServiceDetails = () => {
         if (Array.isArray(data) && data.length > 0) {
           foundService = data.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
         }
-        if (!foundService) {
-          foundService = mockServices.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
+        if (foundService) {
+          setService(foundService);
         }
-        setService(foundService);
-        setLoading(false);
       })
       .catch(err => {
         console.error("Failed to fetch services", err);
-        const foundService = mockServices.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
-        setService(foundService);
-        setLoading(false);
       });
   }, [name]);
 

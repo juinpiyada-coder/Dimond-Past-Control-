@@ -8,8 +8,8 @@ import { FaBed } from 'react-icons/fa';
 import { mockServices } from '../utils/mockData';
 
 const Home = () => {
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [services, setServices] = useState(mockServices);
+  const [loading, setLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -20,15 +20,10 @@ const Home = () => {
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
           setServices(data);
-        } else {
-          setServices(mockServices);
         }
-        setLoading(false);
       })
       .catch(err => {
         console.error("Failed to fetch services", err);
-        setServices(mockServices);
-        setLoading(false);
       });
   }, []);
 

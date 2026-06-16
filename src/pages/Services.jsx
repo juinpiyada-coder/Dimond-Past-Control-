@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 import { mockServices } from '../utils/mockData';
 
 const Services = () => {
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [services, setServices] = useState(mockServices);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
@@ -15,15 +15,10 @@ const Services = () => {
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
           setServices(data);
-        } else {
-          setServices(mockServices);
         }
-        setLoading(false);
       })
       .catch(err => {
         console.error("Failed to fetch services", err);
-        setServices(mockServices);
-        setLoading(false);
       });
   }, []);
 
