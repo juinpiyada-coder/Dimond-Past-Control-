@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Clock, ThumbsUp, ArrowRight, Bug, Home as HomeIcon, CheckCircle2, Star, ChevronDown, ChevronUp, PhoneCall, Quote } from 'lucide-react';
-
+import { motion } from 'framer-motion';
 
 const Home = () => {
   const [openFaq, setOpenFaq] = useState(1);
@@ -52,116 +52,203 @@ const Home = () => {
     }
   ];
 
+  // Animation Variants
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  };
+  
+  const fadeInLeft = {
+    hidden: { opacity: 0, x: -50 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  };
+
+  const fadeInRight = {
+    hidden: { opacity: 0, x: 50 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.2 }
+    }
+  };
+
   return (
-    <div className="home-page">
+    <div className="home-page overflow-hidden">
       {/* Hero Section */}
-      <section className="hero">
-        <div className="container hero-content">
-          <span className="hero-subtitle">Kolkata's Biggest Pest Control Company</span>
-          <h1>Welcome To Diamond Pest Control</h1>
-          <p>The most trusted and reliable company providing the best pest control solutions in India. We are constantly pushing the envelope with innovations in the niche industry. Today, we take pride in identifying ourselves as the pioneers of the pest management industry.</p>
-          <div className="hero-actions">
+      <section className="hero relative overflow-hidden">
+        <motion.div 
+          className="container hero-content relative z-10"
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+        >
+          <motion.span variants={fadeInUp} className="hero-subtitle">Kolkata's Biggest Pest Control Company</motion.span>
+          <motion.h1 variants={fadeInUp}>Welcome To Diamond Pest Control</motion.h1>
+          <motion.p variants={fadeInUp}>The most trusted and reliable company providing the best pest control solutions in India. We are constantly pushing the envelope with innovations in the niche industry. Today, we take pride in identifying ourselves as the pioneers of the pest management industry.</motion.p>
+          <motion.div variants={fadeInUp} className="hero-actions">
             <Link to="/book" className="btn btn-primary">Book Now</Link>
             <Link to="/contact" className="btn btn-secondary"><PhoneCall size={18} /> Contact Us</Link>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Intro Section */}
       <section className="intro-section section-padding container">
         <div className="intro-grid">
-          <div className="intro-text">
-            <h4 className="section-subtitle">Pest Control Professional</h4>
-            <h2 className="section-title text-left">Welcome To Diamond Pest Control</h2>
-            <p>Are you tired of dealing with cockroaches, termites, bed bugs, or rodents? Don't worry, Diamond Pest Control is here to help. We provide safe, affordable, and effective pest control services to protect your home, office, and surroundings from unwanted pests.</p>
-            <p>Our team of trained professionals uses modern equipment and eco-friendly products to ensure complete pest removal without harming your family, pets, or the environment. Whether you're facing a small problem or a major infestation, we're ready to provide fast and reliable solutions.</p>
-            <p>We understand that every customer and every property is different. That's why we offer customized pest control plans designed to suit your specific needs. From one-time treatments to regular maintenance services, we make sure your space stays pest-free all year round.</p>
-            <div className="intro-actions">
+          <motion.div 
+            className="intro-text"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.h4 variants={fadeInLeft} className="section-subtitle">Pest Control Professional</motion.h4>
+            <motion.h2 variants={fadeInLeft} className="section-title text-left">Welcome To Diamond Pest Control</motion.h2>
+            <motion.p variants={fadeInLeft}>Are you tired of dealing with cockroaches, termites, bed bugs, or rodents? Don't worry, Diamond Pest Control is here to help. We provide safe, affordable, and effective pest control services to protect your home, office, and surroundings from unwanted pests.</motion.p>
+            <motion.p variants={fadeInLeft}>Our team of trained professionals uses modern equipment and eco-friendly products to ensure complete pest removal without harming your family, pets, or the environment. Whether you're facing a small problem or a major infestation, we're ready to provide fast and reliable solutions.</motion.p>
+            <motion.p variants={fadeInLeft}>We understand that every customer and every property is different. That's why we offer customized pest control plans designed to suit your specific needs. From one-time treatments to regular maintenance services, we make sure your space stays pest-free all year round.</motion.p>
+            <motion.div variants={fadeInLeft} className="intro-actions mt-6">
               <Link to="/contact" className="btn btn-primary"><PhoneCall size={18} /> Call Now</Link>
               <Link to="/pricing" className="btn btn-secondary">Get a quote</Link>
-            </div>
-          </div>
-          <div className="intro-image">
-            <img src="/WhatsApp-Image-2026-05-21-at-4.46.12-PM.jpeg" alt="Diamond Pest Control professional" className="featured-image" />
-          </div>
+            </motion.div>
+          </motion.div>
+          <motion.div 
+            className="intro-image"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInRight}
+          >
+            <motion.img 
+              whileHover={{ scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              src="/WhatsApp-Image-2026-05-21-at-4.46.12-PM.jpeg" 
+              alt="Diamond Pest Control professional" 
+              className="featured-image rounded-2xl shadow-2xl" 
+            />
+          </motion.div>
         </div>
       </section>
 
       {/* Who We Are */}
       <section className="who-we-are bg-light section-padding">
         <div className="container intro-grid">
-          <div className="intro-image">
-            <div className="image-placeholder secondary-bg">
+          <motion.div 
+            className="intro-image"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInLeft}
+          >
+            <motion.div 
+              whileHover={{ rotate: 5, scale: 1.05 }}
+              className="image-placeholder secondary-bg shadow-xl"
+            >
               <ThumbsUp size={100} className="placeholder-icon" />
-            </div>
-          </div>
-          <div className="intro-text">
-            <h4 className="section-subtitle">WHO WE ARE</h4>
-            <h2 className="section-title text-left">The Trusted Authority in Pest Control</h2>
-            <p>At our company, we believe every home and business deserves a safe, clean, and pest-free environment. With years of industry experience, our expert team provides reliable and effective pest control solutions tailored to your needs. From termites and rodents to mosquitoes and cockroaches, we use advanced methods and eco-friendly treatments to protect your property with long-lasting results.</p>
-            <ul className="checklist">
-              <li><CheckCircle2 className="check-icon" /> Exceed your expectations</li>
-              <li><CheckCircle2 className="check-icon" /> Deliver 100% satisfaction</li>
-              <li><CheckCircle2 className="check-icon" /> Professional Expert</li>
-              <li><CheckCircle2 className="check-icon" /> Premium support 24/7</li>
-            </ul>
-            <Link to="/about" className="btn btn-primary mt-4">Discover more</Link>
-          </div>
+            </motion.div>
+          </motion.div>
+          <motion.div 
+            className="intro-text"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.h4 variants={fadeInRight} className="section-subtitle">WHO WE ARE</motion.h4>
+            <motion.h2 variants={fadeInRight} className="section-title text-left">The Trusted Authority in Pest Control</motion.h2>
+            <motion.p variants={fadeInRight}>At our company, we believe every home and business deserves a safe, clean, and pest-free environment. With years of industry experience, our expert team provides reliable and effective pest control solutions tailored to your needs. From termites and rodents to mosquitoes and cockroaches, we use advanced methods and eco-friendly treatments to protect your property with long-lasting results.</motion.p>
+            <motion.ul variants={staggerContainer} className="checklist">
+              <motion.li variants={fadeInRight}><CheckCircle2 className="check-icon" /> Exceed your expectations</motion.li>
+              <motion.li variants={fadeInRight}><CheckCircle2 className="check-icon" /> Deliver 100% satisfaction</motion.li>
+              <motion.li variants={fadeInRight}><CheckCircle2 className="check-icon" /> Professional Expert</motion.li>
+              <motion.li variants={fadeInRight}><CheckCircle2 className="check-icon" /> Premium support 24/7</motion.li>
+            </motion.ul>
+            <motion.div variants={fadeInRight}>
+              <Link to="/about" className="btn btn-primary mt-6">Discover more</Link>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* Our Achievement Banner */}
-      <section className="achievements-banner">
+      <motion.section 
+        className="achievements-banner"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeInUp}
+      >
         <div className="container">
-          <h4 className="section-subtitle white">OUR ACHIEVEMENT</h4>
-          <h2>Celebrating Excellence in Pest Control</h2>
-          <div className="achievement-stats">
-            <div className="stat-box">
+          <motion.h4 variants={fadeInUp} className="section-subtitle white">OUR ACHIEVEMENT</motion.h4>
+          <motion.h2 variants={fadeInUp}>Celebrating Excellence in Pest Control</motion.h2>
+          <motion.div variants={staggerContainer} className="achievement-stats">
+            <motion.div variants={fadeInUp} className="stat-box">
               <h3>5000+</h3>
               <p>Happy Clients</p>
-            </div>
-            <div className="stat-box">
+            </motion.div>
+            <motion.div variants={fadeInUp} className="stat-box">
               <h3>15+</h3>
               <p>Years Experience</p>
-            </div>
-            <div className="stat-box">
+            </motion.div>
+            <motion.div variants={fadeInUp} className="stat-box">
               <h3>100%</h3>
               <p>Safe Chemicals</p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* What We Offer */}
       <section className="services-snippet section-padding">
         <div className="container">
-          <h4 className="section-subtitle text-center">WHAT WE OFFER</h4>
-          <h2 className="section-title text-center">Eliminate Unwanted Pests</h2>
-          <div className="services-grid">
-            <div className="service-card">
-              <Bug size={40} className="service-icon" />
-              <h3>Cockroaches</h3>
-              <p>Complete eradication of cockroach infestations.</p>
-            </div>
-            <div className="service-card">
-              <HomeIcon size={40} className="service-icon" />
-              <h3>Termites</h3>
-              <p>Protect your property's structure from termite damage.</p>
-            </div>
-            <div className="service-card">
-              <Bug size={40} className="service-icon" />
-              <h3>Bed Bugs</h3>
-              <p>Sleep peacefully with our specialized bed bug treatments.</p>
-            </div>
-            <div className="service-card">
-              <Bug size={40} className="service-icon" />
-              <h3>Rodents</h3>
-              <p>Effective trapping and exclusion of rats and mice.</p>
-            </div>
-          </div>
-          <div className="text-center mt-4">
+          <motion.div 
+            initial="hidden" 
+            whileInView="visible" 
+            viewport={{ once: true }} 
+            variants={staggerContainer}
+          >
+            <motion.h4 variants={fadeInUp} className="section-subtitle text-center">WHAT WE OFFER</motion.h4>
+            <motion.h2 variants={fadeInUp} className="section-title text-center">Eliminate Unwanted Pests</motion.h2>
+          </motion.div>
+          
+          <motion.div 
+            className="services-grid mt-10"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={staggerContainer}
+          >
+            {[
+              { icon: <Bug size={40} className="service-icon" />, title: "Cockroaches", desc: "Complete eradication of cockroach infestations." },
+              { icon: <HomeIcon size={40} className="service-icon" />, title: "Termites", desc: "Protect your property's structure from termite damage." },
+              { icon: <Bug size={40} className="service-icon" />, title: "Bed Bugs", desc: "Sleep peacefully with our specialized bed bug treatments." },
+              { icon: <Bug size={40} className="service-icon" />, title: "Rodents", desc: "Effective trapping and exclusion of rats and mice." }
+            ].map((service, idx) => (
+              <motion.div 
+                key={idx} 
+                variants={fadeInUp}
+                whileHover={{ y: -10, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
+                className="service-card transition-all duration-300"
+              >
+                {service.icon}
+                <h3>{service.title}</h3>
+                <p>{service.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+          <motion.div 
+            initial="hidden" 
+            whileInView="visible" 
+            viewport={{ once: true }} 
+            variants={fadeInUp} 
+            className="text-center mt-10"
+          >
             <Link to="/services" className="btn btn-secondary">View All Services <ArrowRight size={16} /></Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -169,48 +256,39 @@ const Home = () => {
       <section className="why-choose-us bg-light section-padding">
         <div className="container">
           <div className="why-choose-grid">
-            <div className="why-choose-text">
-              <h4 className="section-subtitle">Why Choose Us</h4>
-              <h2 className="section-title text-left">Diamond Pest Control</h2>
-              <div className="feature-list">
-                <div className="feature-item">
-                  <Shield className="feature-list-icon" />
-                  <div>
-                    <h4>Experienced Professionals</h4>
-                    <p>Our skilled pest control technicians use modern equipment and proven methods to deliver reliable results.</p>
-                  </div>
-                </div>
-                <div className="feature-item">
-                  <ThumbsUp className="feature-list-icon" />
-                  <div>
-                    <h4>Safe & Eco-Friendly Solutions</h4>
-                    <p>We use industry-approved chemicals and treatments that are safe for families, pets, and the environment.</p>
-                  </div>
-                </div>
-                <div className="feature-item">
-                  <Star className="feature-list-icon" />
-                  <div>
-                    <h4>Affordable Pricing</h4>
-                    <p>Transparent pricing with no hidden charges. Customized pest control packages for every budget.</p>
-                  </div>
-                </div>
-                <div className="feature-item">
-                  <Clock className="feature-list-icon" />
-                  <div>
-                    <h4>Quick Response Time</h4>
-                    <p>We provide fast scheduling and emergency pest control support when you need it most.</p>
-                  </div>
-                </div>
-                <div className="feature-item">
-                  <Shield className="feature-list-icon" />
-                  <div>
-                    <h4>Long-Term Protection</h4>
-                    <p>Our preventive treatments help keep pests away for the long term.</p>
-                  </div>
-                </div>
+            <motion.div 
+              className="why-choose-text"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={staggerContainer}
+            >
+              <motion.h4 variants={fadeInLeft} className="section-subtitle">Why Choose Us</motion.h4>
+              <motion.h2 variants={fadeInLeft} className="section-title text-left">Diamond Pest Control</motion.h2>
+              <div className="feature-list mt-8">
+                {[
+                  { icon: <Shield className="feature-list-icon" />, title: "Experienced Professionals", desc: "Our skilled pest control technicians use modern equipment and proven methods." },
+                  { icon: <ThumbsUp className="feature-list-icon" />, title: "Safe & Eco-Friendly Solutions", desc: "Industry-approved chemicals that are safe for families, pets, and the environment." },
+                  { icon: <Star className="feature-list-icon" />, title: "Affordable Pricing", desc: "Transparent pricing with no hidden charges. Customized packages for every budget." },
+                  { icon: <Clock className="feature-list-icon" />, title: "Quick Response Time", desc: "We provide fast scheduling and emergency pest control support." }
+                ].map((item, idx) => (
+                  <motion.div key={idx} variants={fadeInLeft} className="feature-item">
+                    <motion.div whileHover={{ rotate: 15, scale: 1.1 }}>{item.icon}</motion.div>
+                    <div>
+                      <h4>{item.title}</h4>
+                      <p>{item.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-            </div>
-            <div className="why-choose-checklist-box">
+            </motion.div>
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeInRight}
+              className="why-choose-checklist-box shadow-2xl"
+            >
               <h3>We Guarantee Quality</h3>
               <ul className="checklist">
                 <li><CheckCircle2 className="check-icon" /> Exceed your expectations</li>
@@ -218,7 +296,7 @@ const Home = () => {
                 <li><CheckCircle2 className="check-icon" /> Professional Expert</li>
                 <li><CheckCircle2 className="check-icon" /> Premium support 24/7</li>
               </ul>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -226,20 +304,38 @@ const Home = () => {
       {/* Testimonials */}
       <section className="testimonials section-padding">
         <div className="container">
-          <h4 className="section-subtitle text-center">TESTIMONIALS</h4>
-          <h2 className="section-title text-center">WHAT OUR CLIENT SAYS</h2>
+          <motion.div 
+            initial="hidden" 
+            whileInView="visible" 
+            viewport={{ once: true }} 
+            variants={staggerContainer}
+          >
+            <motion.h4 variants={fadeInUp} className="section-subtitle text-center">TESTIMONIALS</motion.h4>
+            <motion.h2 variants={fadeInUp} className="section-title text-center">WHAT OUR CLIENT SAYS</motion.h2>
+          </motion.div>
           
-          <div className="testimonials-grid">
-            {testimonials.map((t, idx) => (
-              <div key={idx} className="testimonial-card">
-                <Quote size={40} className="quote-icon" />
-                <p className="testimonial-text">"{t.text}"</p>
-                <div className="testimonial-author">
-                  <h4>{t.name}</h4>
-                  <span>Pest control service in kolkata</span>
+          <div className="mt-10 overflow-hidden" style={{ cursor: 'grab' }}>
+            <motion.div 
+              animate={{ x: ["0%", "-50%"] }}
+              transition={{ repeat: Infinity, ease: "linear", duration: 30 }}
+              style={{ display: 'flex', gap: '2rem', width: 'max-content' }}
+              whileHover={{ animationPlayState: 'paused' }} // optional enhancement but slightly complex with pure motion unless we use state, let's stick to simple
+            >
+              {[...testimonials, ...testimonials].map((t, idx) => (
+                <div 
+                  key={idx} 
+                  className="testimonial-card shadow-lg"
+                  style={{ minWidth: '350px', maxWidth: '400px', whiteSpace: 'normal', flexShrink: 0 }}
+                >
+                  <Quote size={40} className="quote-icon opacity-20" />
+                  <p className="testimonial-text">"{t.text}"</p>
+                  <div className="testimonial-author">
+                    <h4>{t.name}</h4>
+                    <span>Pest control service in kolkata</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </motion.div>
           </div>
         </div>
       </section>
@@ -247,33 +343,55 @@ const Home = () => {
       {/* FAQ Section */}
       <section className="faq-section bg-light section-padding">
         <div className="container faq-container">
-          <div className="faq-header">
-            <h4 className="section-subtitle">Frequently Asked</h4>
-            <h2 className="section-title text-left">Have Any Question?</h2>
-            <h3 className="sub-heading">Professional Residential And Commercial pest control service</h3>
-            <p>Diamond Pest Control: Your ultimate pest solution. We offer expert residential and commercial pest control services. Our skilled technicians use safe and effective methods to eliminate infestations. Enjoy peace of mind with our comprehensive protection plans.</p>
-            <div className="mt-4">
+          <motion.div 
+            className="faq-header"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.h4 variants={fadeInLeft} className="section-subtitle">Frequently Asked</motion.h4>
+            <motion.h2 variants={fadeInLeft} className="section-title text-left">Have Any Question?</motion.h2>
+            <motion.h3 variants={fadeInLeft} className="sub-heading mt-4">Professional Residential And Commercial pest control service</motion.h3>
+            <motion.p variants={fadeInLeft}>Diamond Pest Control: Your ultimate pest solution. We offer expert residential and commercial pest control services. Our skilled technicians use safe and effective methods to eliminate infestations. Enjoy peace of mind with our comprehensive protection plans.</motion.p>
+            <motion.div variants={fadeInLeft} className="mt-8">
               <Link to="/contact" className="btn btn-primary">Contact Us</Link>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
           
-          <div className="faq-list">
+          <motion.div 
+            className="faq-list"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
             {faqs.map((faq, index) => (
-              <div key={index} className={`faq-item ${openFaq === index ? 'active' : ''}`}>
+              <motion.div 
+                key={index} 
+                variants={fadeInRight}
+                className={`faq-item ${openFaq === index ? 'active' : ''}`}
+              >
                 <button className="faq-question" onClick={() => toggleFaq(index)}>
                   {faq.question}
-                  {openFaq === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  <motion.div animate={{ rotate: openFaq === index ? 180 : 0 }}>
+                    <ChevronDown size={20} />
+                  </motion.div>
                 </button>
-                <div className="faq-answer">
-                  <p dangerouslySetInnerHTML={{ __html: faq.answer }}></p>
-                </div>
-              </div>
+                <motion.div 
+                  initial={false}
+                  animate={{ height: openFaq === index ? "auto" : 0, opacity: openFaq === index ? 1 : 0 }}
+                  className="faq-answer overflow-hidden"
+                >
+                  <p className="py-4" dangerouslySetInnerHTML={{ __html: faq.answer }}></p>
+                </motion.div>
+              </motion.div>
             ))}
-            <div className="faq-footer-help mt-4">
+            <motion.div variants={fadeInRight} className="faq-footer-help mt-8 p-6 bg-white rounded-xl shadow-md text-center">
               <h4>Still have questions?</h4>
-              <Link to="/contact" className="btn btn-secondary mt-2">Contact Us</Link>
-            </div>
-          </div>
+              <Link to="/contact" className="btn btn-secondary mt-4 inline-block">Contact Us</Link>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
     </div>

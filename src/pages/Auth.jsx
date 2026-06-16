@@ -1,9 +1,104 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Phone, Lock, User as UserIcon } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
+import { apiCall } from '../utils/api';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [freezeTimeLeft, setFreezeTimeLeft] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Load attempts from local storage to persist across reloads
+    const storedAttempts = localStorage.getItem('loginAttempts');
+    if (storedAttempts) {
+      setAttempts(parseInt(storedAttempts, 10));
+    }
+
+    // Check freeze status
+    const storedFreezeUntil = localStorage.getItem('loginFreezeUntil');
+    if (storedFreezeUntil) {
+      const freezeUntil = parseInt(storedFreezeUntil, 10);
+      if (Date.now() < freezeUntil) {
+        setFreezeTimeLeft(Math.ceil((freezeUntil - Date.now()) / 1000));
+      } else {
+        // Freeze is over, reset
+        localStorage.removeItem('loginAttempts');
+        localStorage.removeItem('loginFreezeUntil');
+        setAttempts(0);
+      }
+    }
+  }, []);
+
+  // Timer effect for freeze countdown
+  useEffect(() => {
+    let timer;
+    if (freezeTimeLeft > 0) {
+      timer = setInterval(() => {
+        setFreezeTimeLeft((prev) => {
+          if (prev <= 1) {
+            // Unfreeze when timer reaches 0
+            localStorage.removeItem('loginAttempts');
+            localStorage.removeItem('loginFreezeUntil');
+            setAttempts(0);
+            setError('');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [freezeTimeLeft]);
+
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (freezeTimeLeft > 0) {
+      setError(`Maximum login attempts reached. Please try again in ${freezeTimeLeft} seconds.`);
+      return;
+    }
+
+    if (isLogin) {
+      setLoading(true);
+      try {
+        const response = await apiCall('/login', 'POST', { email, password });
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        localStorage.setItem('loginAttempts', '0'); // Reset attempts on success
+        localStorage.removeItem('loginFreezeUntil');
+        if (response.user.role.includes('ADMIN')) {
+          window.location.href = '/dashboard';
+        } else {
+          window.location.href = '/user-dashboard';
+        }
+      } catch (err) {
+        const newAttempts = attempts + 1;
+        setAttempts(newAttempts);
+        localStorage.setItem('loginAttempts', newAttempts.toString());
+        
+        if (newAttempts >= 5) {
+          const freezeUntil = Date.now() + 60 * 1000; // 1 minute
+          localStorage.setItem('loginFreezeUntil', freezeUntil.toString());
+          setFreezeTimeLeft(60);
+          setError('Maximum login attempts reached. Please try again in 60 seconds.');
+        } else {
+          setError(err.message || 'Login failed');
+        }
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Sign up placeholder
+      setError('Sign up is not implemented yet. Please use login.');
+    }
+  };
 
   return (
     <div className="auth-page">
@@ -18,7 +113,11 @@ const Auth = () => {
           <button className={`auth-tab ${!isLogin ? 'active' : ''}`} onClick={() => setIsLogin(false)}>Sign Up</button>
         </div>
 
-        <form className="auth-form">
+        {error && <div className="error-message" style={{ color: 'red', marginBottom: '15px', textAlign: 'center' }}>{error}</div>}
+        {attempts > 0 && isLogin && attempts < 5 && <div style={{ color: 'orange', marginBottom: '15px', textAlign: 'center' }}>Failed attempts: {attempts}/5</div>}
+        {freezeTimeLeft > 0 && isLogin && <div style={{ color: 'red', marginBottom: '15px', textAlign: 'center', fontWeight: 'bold' }}>Account frozen. Try again in {freezeTimeLeft}s</div>}
+
+        <form className="auth-form" onSubmit={handleAuth}>
           {!isLogin && (
             <div className="form-group">
               <label><UserIcon size={16} /> Full Name</label>
@@ -27,17 +126,17 @@ const Auth = () => {
           )}
           
           <div className="form-group">
-            <label><Mail size={16} /> Email Address or Phone</label>
-            <input type="text" className="form-control" placeholder="john@example.com or +1 234..." />
+            <label><Mail size={16} /> Email Address</label>
+            <input type="email" required className="form-control" placeholder="john@example.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={freezeTimeLeft > 0} />
           </div>
 
           <div className="form-group">
             <label><Lock size={16} /> Password</label>
-            <input type="password" className="form-control" placeholder="••••••••" />
+            <input type="password" required className="form-control" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} disabled={freezeTimeLeft > 0} />
           </div>
 
-          <button type="button" className="btn btn-primary auth-submit">
-            {isLogin ? 'Login' : 'Sign Up'}
+          <button type="submit" className="btn btn-primary auth-submit" disabled={loading || freezeTimeLeft > 0}>
+            {loading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
           </button>
         </form>
 
@@ -46,7 +145,7 @@ const Auth = () => {
         </div>
 
         <div className="social-login">
-          <button className="btn social-btn google-btn">
+          <button className="btn social-btn google-btn" disabled={freezeTimeLeft > 0}>
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" />
             Continue with Google
           </button>

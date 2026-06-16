@@ -1,0 +1,93 @@
+import React, { useState, useEffect } from 'react';
+import { FiSave, FiX, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { apiCall } from '../../utils/api';
+
+const ServiceDataEntry = ({ entityId, onClose }) => {
+  const [formData, setFormData] = useState({ pest_id: '', service_name: '', description: '', duration_hours: '', base_price: '', status: 'ACTIVE', service_image: '' });
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(!!entityId);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    if (entityId) fetchEntity();
+  }, [entityId]);
+
+  const fetchEntity = async () => {
+    try {
+      const data = await apiCall('/services/' + entityId);
+      if (data && !data.error) setFormData(data);
+      else setError('Failed to fetch details');
+    } catch (err) {
+      setError(err.message || 'Error fetching details');
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e, fieldName) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, [fieldName]: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      let result;
+      if (entityId) {
+        result = await apiCall('/services/' + entityId, 'PUT', formData);
+      } else {
+        result = await apiCall('/services', 'POST', formData);
+      }
+      if (result && !result.error) {
+        setSuccess('Saved successfully!');
+        setTimeout(() => onClose(), 1500);
+      } else {
+        throw new Error(result?.error || 'Unknown error occurred');
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to save');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (fetching) return <div style={{ padding: '3rem', textAlign: 'center' }}>Loading...</div>;
+
+  return (
+    <div style={{ backgroundColor: 'white', borderRadius: '1rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', overflow: 'hidden' }}>
+      <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600 }}>{entityId ? 'Edit Service' : 'Create Service'}</h2>
+        <button type='button' onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><FiX size={20} /></button>
+      </div>
+      <div style={{ padding: '2rem' }}>
+        {error && <div style={{ color: '#b91c1c', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><FiAlertCircle /> {error}</div>}
+        {success && <div style={{ color: '#15803d', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><FiCheck /> {success}</div>}
+        <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}><label style={{ fontWeight: 500, fontSize: '0.875rem' }}>Pest ID</label><input type='number' name='pest_id' value={formData.pest_id || ''} onChange={handleChange} required style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }} /></div><div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}><label style={{ fontWeight: 500, fontSize: '0.875rem' }}>Service Name</label><input type='text' name='service_name' value={formData.service_name || ''} onChange={handleChange} required style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }} /></div><div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}><label style={{ fontWeight: 500, fontSize: '0.875rem' }}>Description</label><textarea name='description' value={formData.description || ''} onChange={handleChange}  style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }} rows='4'></textarea></div><div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}><label style={{ fontWeight: 500, fontSize: '0.875rem' }}>Duration (Hours)</label><input type='number' name='duration_hours' value={formData.duration_hours || ''} onChange={handleChange}  style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }} /></div><div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}><label style={{ fontWeight: 500, fontSize: '0.875rem' }}>Base Price</label><input type='number' name='base_price' value={formData.base_price || ''} onChange={handleChange}  style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }} /></div><div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}><label style={{ fontWeight: 500, fontSize: '0.875rem' }}>Status</label><select name='status' value={formData.status || ''} onChange={handleChange} style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }}><option value='ACTIVE'>ACTIVE</option><option value='INACTIVE'>INACTIVE</option></select></div><div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}><label style={{ fontWeight: 500, fontSize: '0.875rem' }}>Service Image (Upload)</label><input type='file' accept='image/*,application/pdf' onChange={(e) => handleImageChange(e, 'service_image')} style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }} />{formData.service_image && typeof formData.service_image === 'string' && formData.service_image.startsWith('data:image') && <img src={formData.service_image} alt='Preview' style={{ maxWidth: '200px', marginTop: '0.5rem' }} />}</div>
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', paddingTop: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
+            <button type='button' onClick={onClose} style={{ padding: '0.75rem 1.5rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', cursor: 'pointer' }}>Cancel</button>
+            <button type='submit' disabled={loading} style={{ padding: '0.75rem 1.5rem', borderRadius: '0.5rem', backgroundColor: '#2563eb', color: 'white', border: 'none', cursor: loading ? 'not-allowed' : 'pointer' }}>
+              <FiSave /> {loading ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+export default ServiceDataEntry;
