@@ -23,7 +23,7 @@ const Header = () => {
           --header-height: 105px !important;
         }
         .amazon-header {
-          background-color: var(--secondary, #2A329F);
+          background: linear-gradient(135deg, var(--secondary, #2A329F) 0%, #1e3a8a 60%, #dca800 100%);
           color: white;
           position: fixed;
           top: 0; left: 0; right: 0;

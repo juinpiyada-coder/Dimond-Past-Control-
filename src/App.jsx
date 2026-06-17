@@ -24,15 +24,35 @@ const Contact = () => <div className="page container"><h1 className="section-tit
 const Payment = () => <div className="page container"><h1 className="section-title">Payment Page</h1></div>;
 const Reviews = () => <div className="page container"><h1 className="section-title">Reviews</h1></div>;
 
-const MainLayout = () => (
-  <div className="app-container">
-    <Header />
-    <main className="main-content">
-      <Outlet />
-    </main>
-    <Footer />
-  </div>
-);
+import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import FifaLoader from './components/FifaLoader';
+
+const MainLayout = () => {
+  const location = useLocation();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Show loader on route change
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 800); // Show loader for 800ms
+    
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
+  return (
+    <div className="app-container">
+      {loading && <FifaLoader />}
+      <Header />
+      <main className="main-content">
+        <Outlet />
+      </main>
+      <Footer />
+    </div>
+  );
+};
 
 function App() {
   return (

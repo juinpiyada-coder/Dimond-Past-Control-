@@ -41,13 +41,13 @@ const Home = () => {
   }, []);
 
   const pestCategories = [
-    { name: "Cockroaches", icon: <FaBugs size={24} color="#666" /> },
-    { name: "Termites", icon: <FaBug size={24} color="#666" /> },
-    { name: "Bed Bugs", icon: <FaBed size={24} color="#666" /> },
-    { name: "Rodents", icon: <GiRat size={24} color="#666" /> },
-    { name: "Mosquitoes", icon: <FaMosquito size={24} color="#666" /> },
-    { name: "Ants", icon: <GiAnt size={24} color="#666" /> },
-    { name: "Wood Borer", icon: <FaLocust size={24} color="#666" /> },
+    { name: "Cockroaches", icon: <FaBugs size={32} color="#2A329F" /> },
+    { name: "Termites", icon: <FaBug size={32} color="#2A329F" /> },
+    { name: "Bed Bugs", icon: <FaBed size={32} color="#2A329F" /> },
+    { name: "Rodents", icon: <GiRat size={32} color="#2A329F" /> },
+    { name: "Mosquitoes", icon: <FaMosquito size={32} color="#2A329F" /> },
+    { name: "Ants", icon: <GiAnt size={32} color="#2A329F" /> },
+    { name: "Wood Borer", icon: <FaLocust size={32} color="#2A329F" /> },
   ];
 
   
@@ -126,22 +126,13 @@ const Home = () => {
         </ul>
       </div>
 
-      {/* Top Bar / Location (Flipkart style) */}
-      <div style={{ background: 'var(--primary, #FFEE00)', padding: '10px', display: 'flex', alignItems: 'center', gap: '10px' }} className="fk-hide-default">
-        <Menu size={24} color="#111" onClick={() => setIsSidebarOpen(true)} style={{ cursor: 'pointer' }} />
-        <div style={{ flexGrow: 1, background: 'rgba(255,255,255,0.9)', padding: '8px 12px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <MapPin size={16} color="#666" />
-          <span style={{ fontSize: '0.85rem', color: '#333', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            Kolkata, West Bengal
-          </span>
-        </div>
-      </div>
+
 
       {/* Category Ribbon */}
       <div className="fk-category-ribbon">
         <div className="fk-category-item" onClick={() => setIsSidebarOpen(true)}>
-          <div className="fk-category-icon-wrapper" style={{ background: '#e0e0e0' }}>
-            <Menu size={24} color="#666" />
+          <div className="fk-category-icon-wrapper">
+            <Menu size={32} color="#2A329F" />
           </div>
           <span className="fk-category-text">All Pests</span>
         </div>
@@ -228,7 +219,7 @@ const Home = () => {
       
 
       {/* Legacy Content Integrated Below E-commerce layout */}
-      <div className="legacy-content-wrapper" style={{ paddingBottom: '80px', backgroundColor: '#fff' }}>
+      <div className="legacy-content-wrapper" style={{ backgroundColor: '#fff' }}>
         
         {/* Intro Section */}
         <section className="intro-section section-padding container" style={{ marginTop: '20px' }}>
@@ -380,28 +371,7 @@ const Home = () => {
           </div>
         </section>
       </div>
-      {/* Bottom Navigation */}
-      <div className="fk-bottom-nav">
-        <Link to="/" className="fk-bottom-nav-item active">
-          <HomeIcon size={24} />
-          <span>Home</span>
-        </Link>
-        <Link to="/services" className="fk-bottom-nav-item">
-          <Grid size={24} />
-          <span>Categories</span>
-        </Link>
-        <Link to="/profile" className="fk-bottom-nav-item">
-          <User size={24} />
-          <span>Account</span>
-        </Link>
-        <Link to="/book" className="fk-bottom-nav-item">
-          <div style={{ position: 'relative' }}>
-            <ShoppingCart size={24} />
-            <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'red', color: 'white', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 'bold' }}>1</span>
-          </div>
-          <span>Cart</span>
-        </Link>
-      </div>
+
 
     </div>
   );
