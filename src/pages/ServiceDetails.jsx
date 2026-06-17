@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Shield, Bug } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { fetchCached } from '../utils/api';
+import { apiCall } from '../utils/api';
 
 const ServiceDetails = () => {
   const { name } = useParams();
@@ -12,26 +12,21 @@ const ServiceDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_BASE_URL;
-    if (apiUrl) {
-      fetchCached(`${apiUrl}/services`)
-        .then(data => {
-          let foundService = null;
-          if (Array.isArray(data) && data.length > 0) {
-            foundService = data.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
-          }
-          if (foundService) {
-            setService(foundService);
-          }
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error("Failed to fetch services", err);
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
+    apiCall('/services')
+      .then(data => {
+        let foundService = null;
+        if (Array.isArray(data) && data.length > 0) {
+          foundService = data.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
+        }
+        if (foundService) {
+          setService(foundService);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to fetch services", err);
+        setLoading(false);
+      });
   }, [name]);
 
   if (loading) {

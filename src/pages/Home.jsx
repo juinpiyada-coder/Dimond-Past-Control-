@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { GiRat, GiAnt } from 'react-icons/gi';
 import { FaBug, FaBugs, FaMosquito, FaLocust } from 'react-icons/fa6';
 import { FaBed } from 'react-icons/fa';
-import { fetchCached } from '../utils/api';
+import { apiCall } from '../utils/api';
 
 const Home = () => {
   const [services, setServices] = useState([]);
@@ -14,10 +14,8 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_BASE_URL;
-    if (apiUrl) {
-      fetchCached(`${apiUrl}/services`)
-        .then(data => {
+    apiCall('/services')
+      .then(data => {
           if (Array.isArray(data) && data.length > 0) {
             setServices(data);
           }
@@ -27,9 +25,7 @@ const Home = () => {
           console.error("Failed to fetch services", err);
           setLoading(false);
         });
-    } else {
-      setLoading(false);
-    }
+
   }, []);
 
   const pestCategories = [

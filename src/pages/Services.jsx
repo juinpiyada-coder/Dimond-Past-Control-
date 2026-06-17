@@ -2,29 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Leaf, ShieldAlert, Clock, Bug } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { fetchCached } from '../utils/api';
+import { apiCall } from '../utils/api';
 
 const Services = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_BASE_URL;
-    if (apiUrl) {
-      fetchCached(`${apiUrl}/services`)
-        .then(data => {
-          if (Array.isArray(data) && data.length > 0) {
-            setServices(data);
-          }
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error("Failed to fetch services", err);
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
+    apiCall('/services')
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setServices(data);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to fetch services", err);
+        setLoading(false);
+      });
   }, []);
 
   const fadeInUp = {
