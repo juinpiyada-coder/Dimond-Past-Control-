@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Leaf, ShieldAlert, Clock, Bug } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Skeleton from '../components/Skeleton';
+import { fetchCached } from '../utils/api';
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -11,8 +12,7 @@ const Services = () => {
   useEffect(() => {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     if (apiUrl) {
-      fetch(`${apiUrl}/services`)
-        .then(r => r.json())
+      fetchCached(`${apiUrl}/services`)
         .then(data => {
           if (Array.isArray(data) && data.length > 0) {
             setServices(data);

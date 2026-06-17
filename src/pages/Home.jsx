@@ -7,6 +7,8 @@ import { FaBug, FaBugs, FaMosquito, FaLocust } from 'react-icons/fa6';
 import { FaBed } from 'react-icons/fa';
 import Skeleton from '../components/Skeleton';
 
+import { fetchCached } from '../utils/api';
+
 const Home = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,8 +18,7 @@ const Home = () => {
   useEffect(() => {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     if (apiUrl) {
-      fetch(`${apiUrl}/services`)
-        .then(r => r.json())
+      fetchCached(`${apiUrl}/services`)
         .then(data => {
           if (Array.isArray(data) && data.length > 0) {
             setServices(data);

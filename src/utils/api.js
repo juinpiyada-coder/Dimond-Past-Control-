@@ -30,3 +30,23 @@ export const apiCall = async (endpoint, method = 'GET', body = null) => {
 
   return data;
 };
+
+// Simple in-memory cache
+const cache = new Map();
+
+export const fetchCached = async (url) => {
+  if (cache.has(url)) {
+    const { data, timestamp } = cache.get(url);
+    // Cache for 5 minutes (300000 ms)
+    if (Date.now() - timestamp < 300000) {
+      return data;
+    }
+  }
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const data = await response.json();
+  cache.set(url, { data, timestamp: Date.now() });
+  return data;
+};

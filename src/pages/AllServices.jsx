@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Shield, Bug } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Skeleton from '../components/Skeleton';
+import { fetchCached } from '../utils/api';
 
 const AllServices = () => {
   const navigate = useNavigate();
@@ -12,8 +13,7 @@ const AllServices = () => {
   useEffect(() => {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     if (apiUrl) {
-      fetch(`${apiUrl}/services`)
-        .then(r => r.json())
+      fetchCached(`${apiUrl}/services`)
         .then(data => {
           if (Array.isArray(data)) {
             setServices(data);
