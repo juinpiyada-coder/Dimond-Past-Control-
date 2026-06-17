@@ -238,6 +238,11 @@ const Header = () => {
 
       {/* Top Bar (Nav Belt) */}
       <div className="amz-nav-belt">
+        {/* Mobile Hamburger */}
+        <div className="mobile-only" style={{ cursor: 'pointer', marginRight: '10px' }} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          <Menu size={28} />
+        </div>
+
         {/* Logo */}
         <Link to="/" className="amz-logo-link">
           <img src="/logo1.png" alt="Diamond Pest Control Logo" className="amz-logo-img" />
