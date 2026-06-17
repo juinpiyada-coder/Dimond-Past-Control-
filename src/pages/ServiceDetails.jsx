@@ -2,28 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Shield, Bug } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { mockServices } from '../utils/mockData';
 
 const ServiceDetails = () => {
   const { name } = useParams();
   const navigate = useNavigate();
   
-  const decodedName = decodeURIComponent(name).toLowerCase();
-  const initialService = mockServices.find(s => 
-    s.service_name.toLowerCase() === decodedName ||
-    s.service_name.toLowerCase() === decodedName.replace(' treatment', '') ||
-    s.service_name.toLowerCase() === decodedName.replace(' control', '')
-  ) || mockServices[0]; // Fallback to first mock service so there's never a delay
-
-  const [service, setService] = useState(initialService);
+  const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Force hide loader after 300ms no matter what
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 300);
-
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     if (apiUrl) {
       fetch(`${apiUrl}/services`)
@@ -36,17 +23,15 @@ const ServiceDetails = () => {
           if (foundService) {
             setService(foundService);
           }
-          clearTimeout(timer);
           setLoading(false);
         })
         .catch(err => {
           console.error("Failed to fetch services", err);
-          clearTimeout(timer);
           setLoading(false);
         });
+    } else {
+      setLoading(false);
     }
-
-    return () => clearTimeout(timer);
   }, [name]);
 
   if (loading) {

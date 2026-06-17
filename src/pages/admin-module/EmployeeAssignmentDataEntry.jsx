@@ -77,7 +77,7 @@ const EmployeeAssignmentDataEntry = ({ entityId, onClose }) => {
       }
       if (result && !result.error) {
         setSuccess('Saved successfully!');
-        setTimeout(() => onClose(), 1500);
+        onClose();
       } else {
         throw new Error(result?.error || 'Unknown error occurred');
       }

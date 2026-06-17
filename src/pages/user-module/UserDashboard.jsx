@@ -19,7 +19,6 @@ const UserDashboard = () => {
     return params.get('tab') || 'overview';
   });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isTabLoading, setIsTabLoading] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -35,16 +34,6 @@ const UserDashboard = () => {
       setActiveTab(tab);
     }
   }, [window.location.search]);
-
-  // Trigger loader on tab switch
-  useEffect(() => {
-    setIsTabLoading(true);
-    const timer = setTimeout(() => {
-      setIsTabLoading(false);
-    }, 1500); // Show loader for 1.5 seconds
-    
-    return () => clearTimeout(timer);
-  }, [activeTab]);
 
   if (!user) return null;
 
@@ -77,7 +66,6 @@ const UserDashboard = () => {
 
   return (
     <>
-      {isTabLoading && <FifaLoader />}
       <div style={{ display: 'flex', minHeight: 'calc(100vh - 80px)', backgroundColor: '#f8fafc' }}>
         
         {/* Mobile Sidebar Toggle */}
@@ -153,7 +141,7 @@ const UserDashboard = () => {
         {/* Main Content Area */}
         <div style={{ flex: 1, padding: '2rem', overflowY: 'auto', backgroundColor: '#f8fafc' }}>
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-            {!isTabLoading && renderContent()}
+            {renderContent()}
           </div>
         </div>
 

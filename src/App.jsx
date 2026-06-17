@@ -1,20 +1,20 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 
-import Home from './pages/Home';
-import Services from './pages/Services';
-import ServiceDetails from './pages/ServiceDetails';
-import BookService from './pages/BookService';
-import Auth from './pages/Auth';
-import Dashboard from './pages/admin-module/Dashboard';
+const Home = lazy(() => import('./pages/Home'));
+const Services = lazy(() => import('./pages/Services'));
+const ServiceDetails = lazy(() => import('./pages/ServiceDetails'));
+const BookService = lazy(() => import('./pages/BookService'));
+const Auth = lazy(() => import('./pages/Auth'));
+const Dashboard = lazy(() => import('./pages/admin-module/Dashboard'));
 
-import BlogList from './pages/BlogList';
-import BlogPost from './pages/BlogPost';
-import UserDashboard from './pages/user-module/UserDashboard';
+const BlogList = lazy(() => import('./pages/BlogList'));
+const BlogPost = lazy(() => import('./pages/BlogPost'));
+const UserDashboard = lazy(() => import('./pages/user-module/UserDashboard'));
 
-import AboutUs from './pages/AboutUs';
+const AboutUs = lazy(() => import('./pages/AboutUs'));
 
 // Placeholder Pages
 const Pricing = () => <div className="page container"><h1 className="section-title">Pricing</h1></div>;
@@ -24,30 +24,16 @@ const Contact = () => <div className="page container"><h1 className="section-tit
 const Payment = () => <div className="page container"><h1 className="section-title">Payment Page</h1></div>;
 const Reviews = () => <div className="page container"><h1 className="section-title">Reviews</h1></div>;
 
-import { useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import FifaLoader from './components/FifaLoader';
 
 const MainLayout = () => {
-  const location = useLocation();
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // Show loader on route change
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 800); // Show loader for 800ms
-    
-    return () => clearTimeout(timer);
-  }, [location.pathname]);
-
   return (
     <div className="app-container">
-      {loading && <FifaLoader />}
       <Header />
       <main className="main-content">
-        <Outlet />
+        <Suspense fallback={<FifaLoader />}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
     </div>
@@ -79,7 +65,7 @@ function App() {
         </Route>
 
         {/* Standalone Admin Dashboard Route (No Header/Footer) */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Suspense fallback={<FifaLoader />}><Dashboard /></Suspense>} />
       </Routes>
     </Router>
   );

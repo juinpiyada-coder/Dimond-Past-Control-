@@ -88,9 +88,7 @@ const UserDataEntry = ({ userId, onClose }) => {
 
       if (result && !result.error) {
         setSuccess(userId ? 'User updated successfully!' : 'User created successfully!');
-        setTimeout(() => {
-          onClose(); // Auto close after success
-        }, 1500);
+        onClose(); // Auto close after success
       } else {
         throw new Error(result?.error || 'Unknown error occurred');
       }

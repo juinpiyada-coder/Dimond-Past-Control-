@@ -5,20 +5,14 @@ import { motion } from 'framer-motion';
 import { GiRat, GiAnt } from 'react-icons/gi';
 import { FaBug, FaBugs, FaMosquito, FaLocust } from 'react-icons/fa6';
 import { FaBed } from 'react-icons/fa';
-import { mockServices } from '../utils/mockData';
 
 const Home = () => {
-  const [services, setServices] = useState(mockServices);
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Force hide loader after 300ms no matter what
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 300);
-
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     if (apiUrl) {
       fetch(`${apiUrl}/services`)
@@ -27,17 +21,15 @@ const Home = () => {
           if (Array.isArray(data) && data.length > 0) {
             setServices(data);
           }
-          clearTimeout(timer);
           setLoading(false);
         })
         .catch(err => {
           console.error("Failed to fetch services", err);
-          clearTimeout(timer);
           setLoading(false);
         });
+    } else {
+      setLoading(false);
     }
-
-    return () => clearTimeout(timer);
   }, []);
 
   const pestCategories = [
