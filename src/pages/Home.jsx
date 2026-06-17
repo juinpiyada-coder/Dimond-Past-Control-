@@ -158,10 +158,7 @@ const Home = () => {
           </Link>
         </div>
         <div className="fk-deals-scroll">
-          {loading ? (
-            <div style={{ padding: '20px', textAlign: 'center', width: '100%' }}>Loading treatments...</div>
-          ) : (
-            services.slice(0, 5).map((service, idx) => (
+          {services.slice(0, 5).map((service, idx) => (
               <div key={idx} className="fk-deal-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
                 <img 
                   src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')} 
@@ -173,7 +170,7 @@ const Home = () => {
                 <span className="fk-deal-card-action">Book Now</span>
               </div>
             ))
-          )}
+          }
         </div>
       </div>
 
@@ -184,9 +181,7 @@ const Home = () => {
           <span style={{ fontSize: '0.8rem', color: '#878787', fontWeight: 'normal' }}>Sponsored</span>
         </div>
         <div className="fk-suggested-grid">
-          {loading ? (
-            <div style={{ padding: '20px', textAlign: 'center', width: '100%' }}>Loading suggestions...</div>
-          ) : services.map((service, idx) => (
+          {services.map((service, idx) => (
             <div key={idx} className="fk-suggested-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
               <div className="fk-suggested-card-img-wrapper">
                 <img 

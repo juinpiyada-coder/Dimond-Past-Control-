@@ -132,9 +132,7 @@ const CustomerAddresses = ({ user }) => {
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-          {loading ? (
-            <div style={{ padding: '50px', textAlign: 'center' }}>Loading addresses...</div>
-          ) : addresses.length === 0 ? (
+          {addresses.length === 0 ? (
             <div onClick={() => openForm()} style={{ backgroundColor: 'white', borderRadius: '0.5rem', border: '2px dashed #cbd5e1', padding: '3rem', textAlign: 'center', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <Plus size={32} color="#94a3b8" style={{ marginBottom: '1rem' }} />
               <h3 style={{ fontSize: '1.125rem', color: '#64748b', margin: 0 }}>Add a new address</h3>

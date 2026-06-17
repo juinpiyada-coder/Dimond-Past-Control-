@@ -57,9 +57,7 @@ const CustomerPayments = ({ user }) => {
         </div>
       </div>
       
-      {loading ? (
-        <div style={{ padding: '50px', textAlign: 'center' }}>Loading payments...</div>
-      ) : payments.length === 0 ? (
+      {payments.length === 0 ? (
         <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0', padding: '3rem', textAlign: 'center' }}>
           <div style={{ width: '64px', height: '64px', backgroundColor: '#eff6ff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
             <FileText size={32} color="#3b82f6" />

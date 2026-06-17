@@ -48,9 +48,7 @@ const CustomerBookings = ({ user }) => {
         <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#2563eb', margin: 0, display: 'inline-block' }}>My Bookings</h1>
       </div>
       
-      {loading ? (
-        <div style={{ padding: '50px', textAlign: 'center' }}>Loading bookings...</div>
-      ) : error ? (
+      {error ? (
         <div style={{ backgroundColor: '#fee2e2', color: '#991b1b', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #fca5a5' }}>{error}</div>
       ) : bookings.length === 0 ? (
         <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0', padding: '3rem', textAlign: 'center' }}>

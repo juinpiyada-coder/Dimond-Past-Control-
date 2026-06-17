@@ -140,9 +140,7 @@ const GenericModule = ({ moduleKey }) => {
         </button>
       </div>
 
-      {loading && data.length === 0 ? (
-        <div style={{ padding: '50px', textAlign: 'center' }}>Loading...</div>
-      ) : error && data.length === 0 ? (
+      {error && data.length === 0 ? (
         <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '1rem' }}>{error}</div>
       ) : (
         <div style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', border: '1px solid #f1f5f9' }}>

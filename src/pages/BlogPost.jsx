@@ -80,15 +80,7 @@ const BlogPost = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="page" style={{ backgroundColor: '#fdfdfd' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '4rem 1.5rem 2rem 1.5rem', textAlign: 'center' }}>
-          <h2>Loading Post...</h2>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return null;
 
   if (error || !blog) {
     return (

@@ -18,14 +18,6 @@ export const apiCall = async (endpoint, method = 'GET', body = null) => {
     options.body = JSON.stringify(body);
   }
 
-  const cacheKey = `${method}_${endpoint}`;
-  if (method === 'GET' && cache.has(cacheKey)) {
-    const { data, timestamp } = cache.get(cacheKey);
-    if (Date.now() - timestamp < 300000) { // 5 mins cache
-      return data;
-    }
-  }
-
   const response = await fetch(`${BASE_URL}${endpoint}`, options);
   
   const isJson = response.headers.get('content-type')?.includes('application/json');
@@ -36,29 +28,13 @@ export const apiCall = async (endpoint, method = 'GET', body = null) => {
     throw new Error(error);
   }
 
-  if (method === 'GET') {
-    cache.set(cacheKey, { data, timestamp: Date.now() });
-  }
-
   return data;
 };
 
-// Simple in-memory cache
-const cache = new Map();
-
 export const fetchCached = async (url) => {
-  if (cache.has(url)) {
-    const { data, timestamp } = cache.get(url);
-    // Cache for 5 minutes (300000 ms)
-    if (Date.now() - timestamp < 300000) {
-      return data;
-    }
-  }
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
-  const data = await response.json();
-  cache.set(url, { data, timestamp: Date.now() });
-  return data;
+  return await response.json();
 };

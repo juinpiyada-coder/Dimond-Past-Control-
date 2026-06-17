@@ -62,9 +62,7 @@ const AllServices = () => {
       </div>
 
       <div className="container section-padding">
-        {loading ? (
-          <div style={{ padding: '50px', textAlign: 'center' }}>Loading...</div>
-        ) : services.length === 0 ? (
+        {services.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '100px 0' }}>
             <h2>No services found</h2>
             <p>Please check back later.</p>

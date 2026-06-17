@@ -153,9 +153,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {loading && blogs.length === 0 ? (
-        <div style={{ padding: '50px', textAlign: 'center' }}>Loading blogs...</div>
-      ) : error && blogs.length === 0 ? (
+      {error && blogs.length === 0 ? (
         <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '1rem 1.5rem', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <strong>Error:</strong> {error}
         </div>
@@ -240,9 +238,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {loading && users.length === 0 ? (
-        <div style={{ padding: '50px', textAlign: 'center' }}>Loading users...</div>
-      ) : error && users.length === 0 ? (
+      {error && users.length === 0 ? (
         <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '1rem 1.5rem', borderRadius: '0.75rem' }}>{error}</div>
       ) : (
         <div style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>

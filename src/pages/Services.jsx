@@ -122,9 +122,7 @@ const Services = () => {
             </Link>
           </div>
 
-          {loading ? (
-            <div style={{ padding: '50px', textAlign: 'center' }}>Loading services...</div>
-          ) : (
+          {(
             <motion.div
               className="services-grid"
               style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))' }}
