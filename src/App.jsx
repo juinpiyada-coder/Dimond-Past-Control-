@@ -5,6 +5,7 @@ import Footer from './components/Layout/Footer';
 
 const Home = lazy(() => import('./pages/Home'));
 const Services = lazy(() => import('./pages/Services'));
+const AllServices = lazy(() => import('./pages/AllServices'));
 const ServiceDetails = lazy(() => import('./pages/ServiceDetails'));
 const BookService = lazy(() => import('./pages/BookService'));
 const Auth = lazy(() => import('./pages/Auth'));
@@ -49,6 +50,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/all-services" element={<AllServices />} />
           <Route path="/service/:name" element={<ServiceDetails />} />
           <Route path="/book" element={<BookService />} />
           <Route path="/pricing" element={<Pricing />} />

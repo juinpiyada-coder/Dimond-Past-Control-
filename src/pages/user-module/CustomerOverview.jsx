@@ -56,14 +56,6 @@ const CustomerOverview = ({ onNavigate, user }) => {
         })}
       </div>
 
-      {user?.role_id == 1 && (
-        <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid #e2e8f0' }}>
-          <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: '#0f172a' }}>Administration</h2>
-          <Link to="/dashboard" style={{ display: 'inline-block', padding: '0.75rem 1.5rem', backgroundColor: '#0f172a', color: 'white', borderRadius: '0.5rem', textDecoration: 'none', fontWeight: 600 }}>
-            Go to Admin Dashboard
-          </Link>
-        </div>
-      )}
     </div>
   );
 };
