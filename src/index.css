@@ -1754,6 +1754,23 @@ h1, h2, h3, h4 {
 @media (max-width: 768px) {
   .fk-category-ribbon {
     justify-content: flex-start; /* Scroll naturally on mobile */
+    padding: 60px 10px 10px 10px; /* Restored top spacing to clear header */
+    gap: 12px;
+  }
+  .fk-category-item {
+    min-width: 55px;
+  }
+  .fk-category-icon-wrapper {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 5px;
+  }
+  .fk-category-icon-wrapper svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .fk-category-text {
+    font-size: 0.7rem;
   }
 }
 .fk-category-ribbon::-webkit-scrollbar {

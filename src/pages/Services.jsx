@@ -8,11 +8,33 @@ const Services = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const staticServices = [
+    { name: "Cockroaches", path: "/service/cockroaches", img: "/cockroach_control.png", desc: "Complete eradication of cockroaches with targeted gel baiting and odorless sprays." },
+    { name: "Termites", path: "/service/termites", img: "/termite_control.png", desc: "Advanced drill-fill-seal anti-termite treatments for pre and post-construction." },
+    { name: "Bed Bugs", path: "/service/bed-bugs", img: "/bed_bug_control.png", desc: "Intensive multi-step treatment to eliminate bed bugs from all hiding places." },
+    { name: "Rodents", path: "/service/rodents", img: "/rodent_control.png", desc: "Professional trapping and baiting to manage rats and mice securely." },
+    { name: "Mosquitoes", path: "/service/mosquitoes", img: "/mosquito_control.png", desc: "Comprehensive indoor and outdoor thermal fogging for mosquito control." },
+    { name: "Ants", path: "/service/ants", img: "/ant_control.png", desc: "Targeted ant bait application to destroy colonies at their source." },
+    { name: "Wood Borer", path: "/service/wood-borer", img: "/wood_borer_control.png", desc: "Specialized chemical injection to preserve furniture from wood borers." }
+  ];
+
   useEffect(() => {
+    const cachedServices = localStorage.getItem('services');
+    const cacheTime = localStorage.getItem('services_time');
+    const FIVE_MINUTES = 5 * 60 * 1000;
+
+    if (cachedServices && cacheTime && Date.now() - Number(cacheTime) < FIVE_MINUTES) {
+      setServices(JSON.parse(cachedServices));
+      setLoading(false);
+      return;
+    }
+
     apiCall('/services')
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
           setServices(data);
+          localStorage.setItem('services', JSON.stringify(data));
+          localStorage.setItem('services_time', Date.now().toString());
         }
         setLoading(false);
       })
@@ -117,54 +139,96 @@ const Services = () => {
             </Link>
           </div>
 
-          {(
-            <motion.div
-              className="services-grid"
-              style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))' }}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-50px" }}
-              variants={staggerContainer}
-            >
-              {services.map((service, index) => (
-                <motion.div
-                  key={service.service_id || index}
-                  variants={fadeInUp}
-                  whileHover={{ y: -8 }}
-                  style={{ backgroundColor: 'var(--bg-white)', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)', display: 'flex', flexDirection: 'column' }}
-                >
-                  {/* Real Backend Connect Image */}
-                  <div style={{ height: '200px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                    {service.service_image ? (
-                      <img
-                        src={service.service_image}
-                        alt={service.service_name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <div style={{ textAlign: 'center', color: '#94a3b8' }}>
-                        <Bug size={48} style={{ opacity: 0.5, marginBottom: '10px' }} />
-                        <span style={{ display: 'block', fontSize: '0.9rem' }}>Image coming soon</span>
-                      </div>
-                    )}
-                  </div>
+          <motion.div
+            className="services-grid"
+            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', marginBottom: '60px' }}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={staggerContainer}
+          >
+            {staticServices.map((service, index) => (
+              <motion.div
+                key={`static-${index}`}
+                variants={fadeInUp}
+                whileHover={{ y: -8 }}
+                style={{ backgroundColor: 'var(--bg-white)', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)', display: 'flex', flexDirection: 'column' }}
+              >
+                <div style={{ height: '200px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                  <img
+                    src={service.img}
+                    alt={service.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
 
-                  <div style={{ padding: '30px 25px', display: 'flex', flexDirection: 'column', flexGrow: 1, backgroundColor: 'var(--primary)', textAlign: 'center', alignItems: 'center' }}>
-                    <h3 style={{ fontSize: '1.4rem', color: 'var(--text-dark)', marginBottom: '15px', fontWeight: 700 }}>{service.service_name}</h3>
-                    <p style={{ color: 'var(--text-dark)', marginBottom: '25px', flexGrow: 1, lineHeight: 1.6, fontSize: '1.05rem', fontWeight: 400 }}>
-                      {service.description || "Comprehensive pest control treatment ensuring a safe environment."}
-                    </p>
-                    <Link
-                      to={`/service/${encodeURIComponent(service.service_name)}`}
-                      className="btn btn-secondary"
-                      style={{ marginTop: 'auto', padding: '12px 30px', fontSize: '1.1rem' }}
-                    >
-                      Read more
-                    </Link>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
+                <div style={{ padding: '30px 25px', display: 'flex', flexDirection: 'column', flexGrow: 1, backgroundColor: 'var(--primary)', textAlign: 'center', alignItems: 'center' }}>
+                  <h3 style={{ fontSize: '1.4rem', color: 'var(--text-dark)', marginBottom: '15px', fontWeight: 700 }}>{service.name} Treatment</h3>
+                  <p style={{ color: 'var(--text-dark)', marginBottom: '25px', flexGrow: 1, lineHeight: 1.6, fontSize: '1.05rem', fontWeight: 400 }}>
+                    {service.desc}
+                  </p>
+                  <Link
+                    to={service.path}
+                    className="btn btn-secondary"
+                    style={{ marginTop: 'auto', padding: '12px 30px', fontSize: '1.1rem' }}
+                  >
+                    Read more
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {services.length > 0 && (
+            <>
+              <h2 className="section-title" style={{ marginTop: '40px', fontSize: '2rem' }}>Other specialized Services</h2>
+              <motion.div
+                className="services-grid"
+                style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))' }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-50px" }}
+                variants={staggerContainer}
+              >
+                {services.map((service, index) => (
+                  <motion.div
+                    key={service.service_id || index}
+                    variants={fadeInUp}
+                    whileHover={{ y: -8 }}
+                    style={{ backgroundColor: 'var(--bg-white)', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)', display: 'flex', flexDirection: 'column' }}
+                  >
+                    <div style={{ height: '200px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                      {service.service_image ? (
+                        <img
+                          src={service.service_image}
+                          alt={service.service_name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <div style={{ textAlign: 'center', color: '#94a3b8' }}>
+                          <Bug size={48} style={{ opacity: 0.5, marginBottom: '10px' }} />
+                          <span style={{ display: 'block', fontSize: '0.9rem' }}>Image coming soon</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ padding: '30px 25px', display: 'flex', flexDirection: 'column', flexGrow: 1, backgroundColor: 'var(--primary)', textAlign: 'center', alignItems: 'center' }}>
+                      <h3 style={{ fontSize: '1.4rem', color: 'var(--text-dark)', marginBottom: '15px', fontWeight: 700 }}>{service.service_name}</h3>
+                      <p style={{ color: 'var(--text-dark)', marginBottom: '25px', flexGrow: 1, lineHeight: 1.6, fontSize: '1.05rem', fontWeight: 400 }}>
+                        {service.description || "Comprehensive pest control treatment ensuring a safe environment."}
+                      </p>
+                      <Link
+                        to={`/service/${encodeURIComponent(service.service_name)}`}
+                        className="btn btn-secondary"
+                        style={{ marginTop: 'auto', padding: '12px 30px', fontSize: '1.1rem' }}
+                      >
+                        Read more
+                      </Link>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </>
           )}
         </div>
       </section>

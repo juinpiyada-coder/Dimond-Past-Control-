@@ -14,31 +14,47 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const cachedServices = localStorage.getItem('services');
+    const cacheTime = localStorage.getItem('services_time');
+
+    const FIVE_MINUTES = 5 * 60 * 1000;
+
+    if (
+      cachedServices &&
+      cacheTime &&
+      Date.now() - Number(cacheTime) < FIVE_MINUTES
+    ) {
+      setServices(JSON.parse(cachedServices));
+      setLoading(false);
+      return;
+    }
+
     apiCall('/services')
       .then(data => {
-          if (Array.isArray(data) && data.length > 0) {
-            setServices(data);
-          }
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error("Failed to fetch services", err);
-          setLoading(false);
-        });
-
+        if (Array.isArray(data) && data.length > 0) {
+          setServices(data);
+          localStorage.setItem('services', JSON.stringify(data));
+          localStorage.setItem('services_time', Date.now().toString());
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to fetch services", err);
+        setLoading(false);
+      });
   }, []);
 
   const pestCategories = [
-    { name: "Cockroaches", icon: <FaBugs size={32} color="#2A329F" /> },
-    { name: "Termites", icon: <FaBug size={32} color="#2A329F" /> },
-    { name: "Bed Bugs", icon: <FaBed size={32} color="#2A329F" /> },
-    { name: "Rodents", icon: <GiRat size={32} color="#2A329F" /> },
-    { name: "Mosquitoes", icon: <FaMosquito size={32} color="#2A329F" /> },
-    { name: "Ants", icon: <GiAnt size={32} color="#2A329F" /> },
-    { name: "Wood Borer", icon: <FaLocust size={32} color="#2A329F" /> },
+    { name: "Cockroaches", path: "cockroaches", icon: <FaBugs size={32} color="#2A329F" /> },
+    { name: "Termites", path: "termites", icon: <FaBug size={32} color="#2A329F" /> },
+    { name: "Bed Bugs", path: "bed-bugs", icon: <FaBed size={32} color="#2A329F" /> },
+    { name: "Rodents", path: "rodents", icon: <GiRat size={32} color="#2A329F" /> },
+    { name: "Mosquitoes", path: "mosquitoes", icon: <FaMosquito size={32} color="#2A329F" /> },
+    { name: "Ants", path: "ants", icon: <GiAnt size={32} color="#2A329F" /> },
+    { name: "Wood Borer", path: "wood-borer", icon: <FaLocust size={32} color="#2A329F" /> },
   ];
 
-  
+
   const [openFaq, setOpenFaq] = useState(1);
 
   const toggleFaq = (index) => {
@@ -71,7 +87,7 @@ const Home = () => {
   return (
     <div className="fk-home-container">
       {/* Sidebar Overlay */}
-      <div 
+      <div
         className={`fk-sidebar-overlay ${isSidebarOpen ? 'open' : ''}`}
         onClick={() => setIsSidebarOpen(false)}
       ></div>
@@ -84,10 +100,10 @@ const Home = () => {
             <div style={{ fontWeight: 'bold' }}>Hello, User</div>
             <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>Login / Sign Up</div>
           </div>
-          <X 
-            size={24} 
-            style={{ marginLeft: 'auto', cursor: 'pointer' }} 
-            onClick={() => setIsSidebarOpen(false)} 
+          <X
+            size={24}
+            style={{ marginLeft: 'auto', cursor: 'pointer' }}
+            onClick={() => setIsSidebarOpen(false)}
           />
         </div>
         <ul className="fk-sidebar-menu">
@@ -95,10 +111,10 @@ const Home = () => {
             PEST CATEGORIES
           </li>
           {pestCategories.map((cat, idx) => (
-            <Link key={idx} to={`/service/${encodeURIComponent(cat.name)}`} className="fk-sidebar-menu-item" onClick={() => setIsSidebarOpen(false)}>
+            <Link key={idx} to={`/service/${cat.path}`} className="fk-sidebar-menu-item" onClick={() => setIsSidebarOpen(false)}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px' }}>
                 {React.cloneElement(cat.icon, { size: 20, color: "#878787" })}
-              </div> 
+              </div>
               {cat.name} Treatment
             </Link>
           ))}
@@ -125,7 +141,7 @@ const Home = () => {
           <span className="fk-category-text">All Pests</span>
         </div>
         {pestCategories.map((cat, idx) => (
-          <Link to={`/service/${encodeURIComponent(cat.name)}`} key={idx} className="fk-category-item" style={{ textDecoration: 'none' }}>
+          <Link to={`/service/${cat.path}`} key={idx} className="fk-category-item" style={{ textDecoration: 'none' }}>
             <div className="fk-category-icon-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {cat.icon}
             </div>
@@ -155,17 +171,17 @@ const Home = () => {
         </div>
         <div className="fk-deals-scroll">
           {services.slice(0, 5).map((service, idx) => (
-              <div key={idx} className="fk-deal-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
-                <img 
-                  src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')} 
-                  alt={service.service_name} 
-                  className="fk-deal-card-img" 
-                  onError={(e) => { e.target.onerror = null; e.target.src = '/logo.png'; }}
-                />
-                <span className="fk-deal-card-title">{service.service_name}</span>
-                <span className="fk-deal-card-action">Book Now</span>
-              </div>
-            ))
+            <div key={idx} className="fk-deal-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
+              <img
+                src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')}
+                alt={service.service_name}
+                className="fk-deal-card-img"
+                onError={(e) => { e.target.onerror = null; e.target.src = '/logo.png'; }}
+              />
+              <span className="fk-deal-card-title">{service.service_name}</span>
+              <span className="fk-deal-card-action">Book Now</span>
+            </div>
+          ))
           }
         </div>
       </div>
@@ -180,9 +196,9 @@ const Home = () => {
           {services.map((service, idx) => (
             <div key={idx} className="fk-suggested-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
               <div className="fk-suggested-card-img-wrapper">
-                <img 
-                  src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')} 
-                  alt={service.service_name} 
+                <img
+                  src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')}
+                  alt={service.service_name}
                   className="fk-suggested-card-img"
                   onError={(e) => { e.target.onerror = null; e.target.src = '/logo.png'; }}
                 />
@@ -199,11 +215,11 @@ const Home = () => {
         </div>
       </div>
 
-      
+
 
       {/* Legacy Content Integrated Below E-commerce layout */}
       <div className="legacy-content-wrapper" style={{ backgroundColor: '#fff' }}>
-        
+
         {/* Intro Section */}
         <section className="intro-section section-padding container" style={{ marginTop: '20px' }}>
           <div className="intro-grid">

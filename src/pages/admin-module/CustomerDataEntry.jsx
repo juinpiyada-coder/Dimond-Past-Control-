@@ -1,44 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { apiCall } from '../../utils/api';
-import { FiSave, FiX, FiUser, FiMail, FiPhone, FiLock, FiShield, FiActivity } from 'react-icons/fi';
+import { FiSave, FiX, FiUser, FiMail, FiPhone, FiLock, FiActivity, FiMapPin } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
-const UserDataEntry = ({ userId, onClose }) => {
+const CustomerDataEntry = ({ customerId, onClose }) => {
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
     phone: '',
     password_hash: '',
-    role_id: '2', // Default to Customer
+    role_id: '5', // Hardcoded Customer Role
     status: 'ACTIVE'
   });
 
   const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(!!userId);
+  const [fetching, setFetching] = useState(!!customerId);
 
   useEffect(() => {
-    if (userId) {
-      fetchUser();
+    if (customerId) {
+      fetchCustomer();
     }
-  }, [userId]);
+  }, [customerId]);
 
-  const fetchUser = async () => {
+  const fetchCustomer = async () => {
     try {
-      const data = await apiCall(`/users/${userId}`);
+      const data = await apiCall(`/users/${customerId}`);
       if (data && !data.error) {
         setFormData({
           full_name: data.full_name || '',
           email: data.email || '',
           phone: data.phone || '',
-          password_hash: '', // Keep empty
-          role_id: data.role_id?.toString() || '2',
+          password_hash: '',
+          role_id: '5',
           status: data.status || 'ACTIVE'
         });
       } else {
-        toast.error('Failed to fetch user details');
+        toast.error('Failed to fetch customer details');
       }
     } catch (err) {
-      toast.error(err.message || 'Error fetching user');
+      toast.error(err.message || 'Error fetching customer');
     } finally {
       setFetching(false);
     }
@@ -54,21 +54,24 @@ const UserDataEntry = ({ userId, onClose }) => {
     setLoading(true);
 
     try {
-      const payload = { ...formData };
-      if (userId && !payload.password_hash) {
+      const payload = { 
+        ...formData,
+        role_id: 5 // Explicitly set role_id as integer 5 for backend
+      };
+      if (customerId && !payload.password_hash) {
         delete payload.password_hash;
       }
 
-      if (userId) {
-        await apiCall(`/users/${userId}`, 'PUT', payload);
-        toast.success('User profile updated successfully!');
+      if (customerId) {
+        await apiCall(`/users/${customerId}`, 'PUT', payload);
+        toast.success('Customer profile updated successfully!');
       } else {
         await apiCall('/users', 'POST', payload);
-        toast.success('New user provisioned successfully!');
+        toast.success('New customer provisioned successfully!');
       }
       onClose();
     } catch (err) {
-      toast.error(err.message || 'Failed to save user profile.');
+      toast.error(err.message || 'Failed to save customer profile.');
     } finally {
       setLoading(false);
     }
@@ -103,7 +106,7 @@ const UserDataEntry = ({ userId, onClose }) => {
   };
 
   if (fetching) {
-    return <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>Loading user details...</div>;
+    return <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>Loading customer details...</div>;
   }
 
   return (
@@ -113,10 +116,10 @@ const UserDataEntry = ({ userId, onClose }) => {
       <div style={{ padding: '1.5rem 2rem', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2 style={{ margin: 0, color: '#0f172a', fontSize: '1.5rem', fontWeight: 700 }}>
-            {userId ? 'Edit User Identity' : 'Provision New User'}
+            {customerId ? 'Edit Customer Profile' : 'Add New Customer'}
           </h2>
           <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.875rem' }}>
-            {userId ? 'Modify access levels and contact details.' : 'Create a new customer or administrative account.'}
+            {customerId ? 'Update client contact information and status.' : 'Register a new client in the system.'}
           </p>
         </div>
         <button 
@@ -135,18 +138,18 @@ const UserDataEntry = ({ userId, onClose }) => {
         {/* Section 1: Contact Identity */}
         <div style={{ marginBottom: '2.5rem' }}>
           <h3 style={{ margin: '0 0 1rem 0', color: '#1e293b', fontSize: '1.125rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <FiUser color="#2563eb" /> Primary Identity
+            <FiUser color="#2563eb" /> Customer Details
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
             
             <div>
-              <label style={labelStyles}>Full Name</label>
+              <label style={labelStyles}>Full Name *</label>
               <div style={{ position: 'relative' }}>
                 <FiUser style={iconStyles} />
                 <input 
                   type="text" 
                   name="full_name"
-                  placeholder="John Doe"
+                  placeholder="e.g. Jane Smith"
                   value={formData.full_name}
                   onChange={handleChange}
                   style={inputStyles}
@@ -162,7 +165,7 @@ const UserDataEntry = ({ userId, onClose }) => {
                 <input 
                   type="email" 
                   name="email"
-                  placeholder="john@example.com"
+                  placeholder="jane@example.com"
                   value={formData.email}
                   onChange={handleChange}
                   style={inputStyles}
@@ -171,7 +174,7 @@ const UserDataEntry = ({ userId, onClose }) => {
             </div>
 
             <div>
-              <label style={labelStyles}>Phone Number</label>
+              <label style={labelStyles}>Phone Number *</label>
               <div style={{ position: 'relative' }}>
                 <FiPhone style={iconStyles} />
                 <input 
@@ -191,30 +194,13 @@ const UserDataEntry = ({ userId, onClose }) => {
 
         <div style={{ height: '1px', backgroundColor: '#e2e8f0', margin: '2rem 0' }}></div>
 
-        {/* Section 2: Security & Access */}
+        {/* Section 2: Account Access */}
         <div>
           <h3 style={{ margin: '0 0 1rem 0', color: '#1e293b', fontSize: '1.125rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <FiShield color="#2563eb" /> Security & Access
+            <FiLock color="#2563eb" /> Portal Access
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
             
-            <div>
-              <label style={labelStyles}>System Role</label>
-              <div style={{ position: 'relative' }}>
-                <FiShield style={iconStyles} />
-                <select 
-                  name="role_id"
-                  value={formData.role_id}
-                  onChange={handleChange}
-                  style={{...inputStyles, appearance: 'none'}}
-                >
-                  <option value="1">Administrator</option>
-                  <option value="2">Customer</option>
-                  <option value="3">Employee</option>
-                </select>
-              </div>
-            </div>
-
             <div>
               <label style={labelStyles}>Account Status</label>
               <div style={{ position: 'relative' }}>
@@ -225,14 +211,14 @@ const UserDataEntry = ({ userId, onClose }) => {
                   onChange={handleChange}
                   style={{...inputStyles, appearance: 'none'}}
                 >
-                  <option value="ACTIVE">Active (Allowed to Login)</option>
+                  <option value="ACTIVE">Active (Can Book Services)</option>
                   <option value="BLOCKED">Blocked (Suspended)</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label style={labelStyles}>Login Password {userId && <span style={{fontSize: '0.75rem', fontWeight: 400}}>(Leave blank to keep)</span>}</label>
+              <label style={labelStyles}>Login Password {customerId && <span style={{fontSize: '0.75rem', fontWeight: 400}}>(Leave blank to keep current)</span>}</label>
               <div style={{ position: 'relative' }}>
                 <FiLock style={iconStyles} />
                 <input 
@@ -242,7 +228,7 @@ const UserDataEntry = ({ userId, onClose }) => {
                   value={formData.password_hash}
                   onChange={handleChange}
                   style={inputStyles}
-                  required={!userId}
+                  required={!customerId}
                 />
               </div>
             </div>
@@ -268,7 +254,7 @@ const UserDataEntry = ({ userId, onClose }) => {
             onMouseOver={(e) => { if(!loading) e.currentTarget.style.backgroundColor = '#1d4ed8'; }}
             onMouseOut={(e) => { if(!loading) e.currentTarget.style.backgroundColor = '#2563eb'; }}
           >
-            {loading ? 'Saving...' : <><FiSave /> {userId ? 'Update User' : 'Provision User'}</>}
+            {loading ? 'Saving...' : <><FiSave /> {customerId ? 'Update Customer' : 'Save Customer'}</>}
           </button>
         </div>
 
@@ -277,4 +263,4 @@ const UserDataEntry = ({ userId, onClose }) => {
   );
 };
 
-export default UserDataEntry;
+export default CustomerDataEntry;

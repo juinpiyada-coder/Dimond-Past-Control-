@@ -1,12 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, Menu, User, ChevronDown, CheckCircle } from 'lucide-react';
+import { MenuContext, SettingsContext } from '../../App';
+import FifaLoader from '../FifaLoader';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const menus = useContext(MenuContext);
+  const settings = useContext(SettingsContext);
+  const [isNavigating, setIsNavigating] = useState(false);
+  
+  const headerMenus = menus.filter(m => m.menu_location === 'HEADER' && m.is_active === 1).sort((a, b) => a.order_index - b.order_index);
+
+  const handleNavigation = (e, url) => {
+    e.preventDefault();
+    if (settings.enable_fifa_loader === 'true') {
+      setIsNavigating(true);
+      setTimeout(() => {
+        setIsNavigating(false);
+        setIsMobileMenuOpen(false);
+        navigate(url);
+      }, 800);
+    } else {
+      setIsMobileMenuOpen(false);
+      navigate(url);
+    }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -16,6 +38,8 @@ const Header = () => {
   };
 
   return (
+    <>
+    {isNavigating && <FifaLoader />}
     <header className="amazon-header">
       {/* CSS in JS for the specific Amazon layout */}
       <style>{`
@@ -244,9 +268,60 @@ const Header = () => {
         </div>
 
         {/* Logo */}
-        <Link to="/" className="amz-logo-link">
-          <img src="/logo1.png" alt="Diamond Pest Control Logo" className="amz-logo-img" />
-          <span className="desktop-only" style={{ fontSize: '1.2rem', fontWeight: 'bold', marginLeft: '10px' }}>Diamond Pest Control</span>
+        <Link to="/" className="amz-logo-link" style={{ position: 'relative' }}>
+          <style>{`
+            @keyframes rollFootballMobile {
+              0% { transform: translateX(-20px) rotate(0deg); opacity: 0; }
+              15% { opacity: 1; }
+              85% { opacity: 1; }
+              100% { transform: translateX(180px) rotate(360deg); opacity: 0; }
+            }
+            @keyframes rollFootballDesktop {
+              0% { transform: translateX(-20px) rotate(0deg); opacity: 0; }
+              10% { opacity: 1; }
+              90% { opacity: 1; }
+              100% { transform: translateX(300px) rotate(360deg); opacity: 0; }
+            }
+            .fifa-football-anim {
+              position: absolute;
+              bottom: 8px;
+              left: 0;
+              font-size: 20px;
+              animation: rollFootballMobile 4s linear infinite;
+              pointer-events: none;
+              z-index: 5;
+              filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+            }
+            @media (min-width: 769px) {
+              .fifa-football-anim {
+                animation: rollFootballDesktop 5s linear infinite;
+                font-size: 24px;
+                bottom: 12px;
+              }
+            }
+            @keyframes shimmerText {
+              0% { background-position: -200% center; }
+              100% { background-position: 200% center; }
+            }
+            .animated-logo-text {
+              background: linear-gradient(
+                to right,
+                #ffffff 20%,
+                #ffee00 40%,
+                #ffee00 60%,
+                #ffffff 80%
+              );
+              background-size: 200% auto;
+              color: transparent;
+              -webkit-background-clip: text;
+              background-clip: text;
+              animation: shimmerText 3s linear infinite;
+              display: inline-block;
+            }
+          `}</style>
+          <img src="/logo1.png" alt="Diamond Pest Control Logo" className="amz-logo-img" style={{ position: 'relative', zIndex: 10 }} />
+          <span className="desktop-only animated-logo-text" style={{ fontSize: '1.3rem', fontWeight: 'bold', marginLeft: '10px', position: 'relative', zIndex: 10 }}>Diamond Pest Control</span>
+          <div className="fifa-football-anim" title="FIFA World Cup 2026">⚽</div>
         </Link>
 
         {/* Search Bar */}
@@ -310,12 +385,9 @@ const Header = () => {
         >
           <Menu size={20} /> All
         </div>
-        <Link to="/" className="amz-bottom-link">Home</Link>
-        <Link to="/services" className="amz-bottom-link">Pest Services</Link>
-        <Link to="/pricing" className="amz-bottom-link">Pricing</Link>
-        <Link to="/blog" className="amz-bottom-link">Pest Guide & Blog</Link>
-        <Link to="/about" className="amz-bottom-link">About Us</Link>
-        <Link to="/contact" className="amz-bottom-link">Customer Service</Link>
+        {headerMenus.map(menu => (
+          <a key={menu.menu_id} href={menu.url} onClick={(e) => handleNavigation(e, menu.url)} className="amz-bottom-link">{menu.label}</a>
+        ))}
       </div>
 
       {/* Mobile Menu Dropdown Overlay */}
@@ -329,14 +401,15 @@ const Header = () => {
             {user ? <div className="user-avatar" style={{ margin: 0, backgroundColor: 'var(--secondary)', color: 'white' }}>{user.full_name ? user.full_name.charAt(0).toUpperCase() : <User size={16} />}</div> : <User size={24} />}
             Hello, {user ? (user.full_name ? user.full_name.split(' ')[0] : 'User') : 'sign in'}
           </div>
-          <Link to="/" className="amz-bottom-link" style={{ color: '#111', padding: '15px 20px', borderBottom: '1px solid #f1f5f9' }} onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-          <Link to="/services" className="amz-bottom-link" style={{ color: '#111', padding: '15px 20px', borderBottom: '1px solid #f1f5f9' }} onClick={() => setIsMobileMenuOpen(false)}>Services</Link>
-          <Link to="/pricing" className="amz-bottom-link" style={{ color: '#111', padding: '15px 20px', borderBottom: '1px solid #f1f5f9' }} onClick={() => setIsMobileMenuOpen(false)}>Pricing</Link>
-          <Link to="/book" className="amz-bottom-link" style={{ color: '#111', padding: '15px 20px', borderBottom: '1px solid #f1f5f9' }} onClick={() => setIsMobileMenuOpen(false)}>Book Now</Link>
-          <Link to={user ? (user.role === 'ADMIN' ? '/dashboard' : '/user-dashboard') : '/profile'} className="amz-bottom-link" style={{ color: '#111', padding: '15px 20px' }} onClick={() => setIsMobileMenuOpen(false)}>Your Account</Link>
+          {headerMenus.map(menu => (
+            <a key={menu.menu_id} href={menu.url} className="amz-bottom-link" style={{ color: '#111', padding: '15px 20px', borderBottom: '1px solid #f1f5f9' }} onClick={(e) => handleNavigation(e, menu.url)}>{menu.label}</a>
+          ))}
+          <a href="/book" className="amz-bottom-link" style={{ color: '#111', padding: '15px 20px', borderBottom: '1px solid #f1f5f9' }} onClick={(e) => handleNavigation(e, '/book')}>Book Now</a>
+          <a href={user ? (user.role === 'ADMIN' ? '/dashboard' : '/user-dashboard') : '/profile'} className="amz-bottom-link" style={{ color: '#111', padding: '15px 20px' }} onClick={(e) => handleNavigation(e, user ? (user.role === 'ADMIN' ? '/dashboard' : '/user-dashboard') : '/profile')}>Your Account</a>
         </div>
       )}
     </header>
+    </>
   );
 };
 

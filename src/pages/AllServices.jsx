@@ -9,6 +9,16 @@ const AllServices = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const staticServices = [
+    { service_name: "Cockroaches", service_image: "/cockroach_control.png", description: "Complete eradication of cockroaches with targeted gel baiting and odorless sprays.", base_price: 999 },
+    { service_name: "Termites", service_image: "/termite_control.png", description: "Advanced drill-fill-seal anti-termite treatments for pre and post-construction.", base_price: 4500 },
+    { service_name: "Bed Bugs", service_image: "/bed_bug_control.png", description: "Intensive multi-step treatment to eliminate bed bugs from all hiding places.", base_price: 1499 },
+    { service_name: "Rodents", service_image: "/rodent_control.png", description: "Professional trapping and baiting to manage rats and mice securely.", base_price: 1200 },
+    { service_name: "Mosquitoes", service_image: "/mosquito_control.png", description: "Comprehensive indoor and outdoor thermal fogging for mosquito control.", base_price: 1299 },
+    { service_name: "Ants", service_image: "/ant_control.png", description: "Targeted ant bait application to destroy colonies at their source.", base_price: 899 },
+    { service_name: "Wood Borer", service_image: "/wood_borer_control.png", description: "Specialized chemical injection to preserve furniture from wood borers.", base_price: 1599 }
+  ];
+
   useEffect(() => {
     apiCall('/services')
       .then(data => {
@@ -57,14 +67,14 @@ const AllServices = () => {
       </div>
 
       <div className="container section-padding">
-        {services.length === 0 ? (
+        {[...staticServices, ...services].length === 0 ? (
           <div style={{ textAlign: 'center', padding: '100px 0' }}>
             <h2>No services found</h2>
             <p>Please check back later.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '100px' }}>
-            {services.map((service, index) => (
+            {[...staticServices, ...services].map((service, index) => (
               <motion.div 
                 key={service.service_id || index}
                 initial="hidden"

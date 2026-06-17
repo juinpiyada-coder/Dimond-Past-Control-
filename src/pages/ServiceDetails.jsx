@@ -12,10 +12,24 @@ const ServiceDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const cachedServices = localStorage.getItem('services');
+    const cacheTime = localStorage.getItem('services_time');
+    const FIVE_MINUTES = 5 * 60 * 1000;
+
+    if (cachedServices && cacheTime && Date.now() - Number(cacheTime) < FIVE_MINUTES) {
+      const parsedData = JSON.parse(cachedServices);
+      const foundService = parsedData.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
+      if (foundService) setService(foundService);
+      setLoading(false);
+      return;
+    }
+
     apiCall('/services')
       .then(data => {
         let foundService = null;
         if (Array.isArray(data) && data.length > 0) {
+          localStorage.setItem('services', JSON.stringify(data));
+          localStorage.setItem('services_time', Date.now().toString());
           foundService = data.find(s => s.service_name.toLowerCase() === decodeURIComponent(name).toLowerCase());
         }
         if (foundService) {
