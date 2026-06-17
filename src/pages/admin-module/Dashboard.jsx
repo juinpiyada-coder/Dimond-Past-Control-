@@ -5,7 +5,6 @@ import BlogDataEntry from './BlogDataEntry';
 import UserDataEntry from './UserDataEntry';
 import GenericModule from './GenericModule';
 import { FiGrid, FiFileText, FiUsers, FiSettings, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiImage, FiTool, FiStar, FiShare2, FiShield, FiFile, FiCalendar, FiBriefcase, FiMenu, FiChevronDown, FiChevronRight } from 'react-icons/fi';
-import Skeleton from '../../components/Skeleton';
 
 const Dashboard = () => {
   const [blogs, setBlogs] = useState([]);
@@ -155,25 +154,7 @@ const Dashboard = () => {
       </div>
 
       {loading && blogs.length === 0 ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
-          {Array(3).fill(0).map((_, idx) => (
-            <div key={idx} style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', border: '1px solid #f1f5f9' }}>
-              <Skeleton height="180px" borderRadius="0" />
-              <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <Skeleton height="24px" width="80%" />
-                <Skeleton height="16px" width="100%" />
-                <Skeleton height="16px" width="60%" />
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-                  <Skeleton height="36px" width="60px" borderRadius="8px" />
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <Skeleton height="36px" width="36px" borderRadius="8px" />
-                    <Skeleton height="36px" width="36px" borderRadius="8px" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <div style={{ padding: '50px', textAlign: 'center' }}>Loading blogs...</div>
       ) : error && blogs.length === 0 ? (
         <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '1rem 1.5rem', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <strong>Error:</strong> {error}
@@ -260,35 +241,7 @@ const Dashboard = () => {
       </div>
 
       {loading && users.length === 0 ? (
-        <div style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', border: '1px solid #f1f5f9' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-              <tr>
-                <th style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="80px" /></th>
-                <th style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="120px" /></th>
-                <th style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="60px" /></th>
-                <th style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="60px" /></th>
-                <th style={{ padding: '1rem 1.5rem', textAlign: 'right' }}><Skeleton height="20px" width="60px" style={{ marginLeft: 'auto' }} /></th>
-              </tr>
-            </thead>
-            <tbody>
-              {Array(5).fill(0).map((_, idx) => (
-                <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="120px" /></td>
-                  <td style={{ padding: '1rem 1.5rem' }}><Skeleton height="16px" width="150px" style={{ marginBottom: '5px' }} /><Skeleton height="16px" width="100px" /></td>
-                  <td style={{ padding: '1rem 1.5rem' }}><Skeleton height="24px" width="80px" borderRadius="12px" /></td>
-                  <td style={{ padding: '1rem 1.5rem' }}><Skeleton height="24px" width="80px" borderRadius="12px" /></td>
-                  <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                      <Skeleton height="32px" width="32px" borderRadius="6px" />
-                      <Skeleton height="32px" width="32px" borderRadius="6px" />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <div style={{ padding: '50px', textAlign: 'center' }}>Loading users...</div>
       ) : error && users.length === 0 ? (
         <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '1rem 1.5rem', borderRadius: '0.75rem' }}>{error}</div>
       ) : (

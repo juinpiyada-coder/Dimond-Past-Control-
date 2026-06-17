@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Shield, Bug } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Skeleton from '../components/Skeleton';
 import { fetchCached } from '../utils/api';
 
 const AllServices = () => {
@@ -64,21 +63,7 @@ const AllServices = () => {
 
       <div className="container section-padding">
         {loading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '80px' }}>
-             {[1, 2, 3].map(i => (
-                <div key={i} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '50px' }}>
-                  <Skeleton height="350px" borderRadius="12px" />
-                  <div>
-                    <Skeleton height="40px" width="70%" style={{ marginBottom: '20px' }} />
-                    <Skeleton height="16px" width="100%" style={{ marginBottom: '10px' }} />
-                    <Skeleton height="16px" width="100%" style={{ marginBottom: '10px' }} />
-                    <Skeleton height="16px" width="90%" style={{ marginBottom: '30px' }} />
-                    <Skeleton height="100px" borderRadius="12px" style={{ marginBottom: '30px' }} />
-                    <Skeleton height="50px" width="60%" borderRadius="8px" />
-                  </div>
-                </div>
-             ))}
-          </div>
+          <div style={{ padding: '50px', textAlign: 'center' }}>Loading...</div>
         ) : services.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '100px 0' }}>
             <h2>No services found</h2>

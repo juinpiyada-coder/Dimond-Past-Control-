@@ -5,8 +5,6 @@ import { motion } from 'framer-motion';
 import { GiRat, GiAnt } from 'react-icons/gi';
 import { FaBug, FaBugs, FaMosquito, FaLocust } from 'react-icons/fa6';
 import { FaBed } from 'react-icons/fa';
-import Skeleton from '../components/Skeleton';
-
 import { fetchCached } from '../utils/api';
 
 const Home = () => {
@@ -161,13 +159,7 @@ const Home = () => {
         </div>
         <div className="fk-deals-scroll">
           {loading ? (
-            Array(4).fill(0).map((_, idx) => (
-              <div key={idx} className="fk-deal-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '15px' }}>
-                <Skeleton height="80px" borderRadius="50%" width="80px" style={{ margin: '0 auto' }} />
-                <Skeleton height="16px" width="80%" style={{ margin: '0 auto' }} />
-                <Skeleton height="28px" width="100%" borderRadius="20px" />
-              </div>
-            ))
+            <div style={{ padding: '20px', textAlign: 'center', width: '100%' }}>Loading treatments...</div>
           ) : (
             services.slice(0, 5).map((service, idx) => (
               <div key={idx} className="fk-deal-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
@@ -193,15 +185,7 @@ const Home = () => {
         </div>
         <div className="fk-suggested-grid">
           {loading ? (
-            Array(4).fill(0).map((_, idx) => (
-              <div key={idx} className="fk-suggested-card">
-                <Skeleton height="150px" borderRadius="8px 8px 0 0" />
-                <div className="fk-suggested-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <Skeleton height="20px" width="80%" />
-                  <Skeleton height="16px" width="40%" />
-                </div>
-              </div>
-            ))
+            <div style={{ padding: '20px', textAlign: 'center', width: '100%' }}>Loading suggestions...</div>
           ) : services.map((service, idx) => (
             <div key={idx} className="fk-suggested-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
               <div className="fk-suggested-card-img-wrapper">

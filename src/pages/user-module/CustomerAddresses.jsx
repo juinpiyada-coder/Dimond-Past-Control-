@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Plus, Edit2, Trash2 } from 'lucide-react';
 import { apiCall } from '../../utils/api';
-import Skeleton from '../../components/Skeleton';
 
 const CustomerAddresses = ({ user }) => {
   const [addresses, setAddresses] = useState([]);
@@ -134,13 +133,7 @@ const CustomerAddresses = ({ user }) => {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
           {loading ? (
-            Array(3).fill(0).map((_, idx) => (
-              <div key={idx} style={{ backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-                <Skeleton height="20px" width="60%" style={{ marginBottom: '10px' }} />
-                <Skeleton height="16px" width="80%" style={{ marginBottom: '5px' }} />
-                <Skeleton height="16px" width="40%" />
-              </div>
-            ))
+            <div style={{ padding: '50px', textAlign: 'center' }}>Loading addresses...</div>
           ) : addresses.length === 0 ? (
             <div onClick={() => openForm()} style={{ backgroundColor: 'white', borderRadius: '0.5rem', border: '2px dashed #cbd5e1', padding: '3rem', textAlign: 'center', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <Plus size={32} color="#94a3b8" style={{ marginBottom: '1rem' }} />

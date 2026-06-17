@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { apiCall } from '../utils/api';
 import { Calendar, ArrowRight } from 'lucide-react';
-import Skeleton from '../components/Skeleton';
 
 const BlogList = () => {
   const [blogs, setBlogs] = useState([]);
@@ -34,22 +33,7 @@ const BlogList = () => {
       </div>
 
       {loading && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
-          {Array(6).fill(0).map((_, idx) => (
-            <div key={idx} style={{ display: 'flex', flexDirection: 'column', backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', border: '1px solid #e5e7eb' }}>
-              <Skeleton height="200px" borderRadius="0" />
-              <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <Skeleton height="16px" width="40%" />
-                <Skeleton height="24px" width="90%" />
-                <div>
-                  <Skeleton height="16px" width="100%" style={{ marginBottom: '5px' }} />
-                  <Skeleton height="16px" width="80%" />
-                </div>
-                <Skeleton height="20px" width="30%" style={{ marginTop: '10px' }} />
-              </div>
-            </div>
-          ))}
-        </div>
+        <div style={{ padding: '50px', textAlign: 'center' }}>Loading blogs...</div>
       )}
       
       {error && <div style={{ textAlign: 'center', padding: '2rem', color: '#dc2626', backgroundColor: '#fee2e2', borderRadius: '0.5rem', marginBottom: '2rem' }}>{error}</div>}

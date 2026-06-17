@@ -18,6 +18,14 @@ export const apiCall = async (endpoint, method = 'GET', body = null) => {
     options.body = JSON.stringify(body);
   }
 
+  const cacheKey = `${method}_${endpoint}`;
+  if (method === 'GET' && cache.has(cacheKey)) {
+    const { data, timestamp } = cache.get(cacheKey);
+    if (Date.now() - timestamp < 300000) { // 5 mins cache
+      return data;
+    }
+  }
+
   const response = await fetch(`${BASE_URL}${endpoint}`, options);
   
   const isJson = response.headers.get('content-type')?.includes('application/json');
@@ -26,6 +34,10 @@ export const apiCall = async (endpoint, method = 'GET', body = null) => {
   if (!response.ok || (data && data.error)) {
     const error = (data && data.error) || response.statusText;
     throw new Error(error);
+  }
+
+  if (method === 'GET') {
+    cache.set(cacheKey, { data, timestamp: Date.now() });
   }
 
   return data;
