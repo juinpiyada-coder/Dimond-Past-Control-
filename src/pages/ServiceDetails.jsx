@@ -69,13 +69,70 @@ const ServiceDetails = () => {
 
   return (
     <div className="service-details-page">
+      <style>{`
+        .service-details-header {
+          padding: 60px 0;
+          background-color: var(--secondary);
+        }
+        .service-details-title {
+          color: var(--text-light);
+          font-size: 3rem;
+          margin-bottom: 10px;
+        }
+        .service-details-subtitle {
+          color: var(--primary);
+          font-size: 1.2rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+        .service-details-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+          gap: 50px;
+          align-items: flex-start;
+        }
+        .service-details-image {
+          min-height: 400px;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: var(--shadow-md);
+          background-color: #f1f5f9;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .service-details-h2 {
+          font-size: 2.5rem;
+          margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+          .service-details-header {
+            padding: 40px 0;
+          }
+          .service-details-title {
+            font-size: 2rem;
+          }
+          .service-details-subtitle {
+            font-size: 1rem;
+          }
+          .service-details-grid {
+            gap: 30px;
+          }
+          .service-details-image {
+            min-height: 250px;
+          }
+          .service-details-h2 {
+            font-size: 1.8rem;
+          }
+        }
+      `}</style>
       {/* Header */}
-      <div className="page-header" style={{ padding: '60px 0', backgroundColor: 'var(--secondary)' }}>
+      <div className="page-header service-details-header">
         <div className="container">
           <motion.h1 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            style={{ color: 'var(--text-light)', fontSize: '3rem', marginBottom: '10px' }}
+            className="service-details-title"
           >
             {service.service_name}
           </motion.h1>
@@ -83,7 +140,7 @@ const ServiceDetails = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            style={{ color: 'var(--primary)', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '1px' }}
+            className="service-details-subtitle"
           >
             Professional Extermination & Prevention
           </motion.p>
@@ -92,14 +149,14 @@ const ServiceDetails = () => {
 
       {/* Content Section */}
       <div className="container section-padding">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '50px', alignItems: 'flex-start' }}>
+        <div className="service-details-grid">
           
           {/* Image Column */}
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            style={{ borderRadius: '12px', overflow: 'hidden', boxShadow: 'var(--shadow-md)', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}
+            className="service-details-image"
           >
             {service.service_image ? (
               <img 
@@ -121,7 +178,7 @@ const ServiceDetails = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h2 className="section-title text-left" style={{ fontSize: '2.5rem', marginBottom: '20px' }}>
+            <h2 className="section-title text-left service-details-h2">
               Comprehensive {service.service_name} Solutions
             </h2>
             <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', lineHeight: 1.8, marginBottom: '30px' }}>
