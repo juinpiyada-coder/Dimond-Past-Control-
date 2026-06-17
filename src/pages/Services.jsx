@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Leaf, ShieldAlert, Clock, Bug } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Skeleton from '../components/Skeleton';
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -118,8 +119,18 @@ const Services = () => {
           <h2 className="section-title">Our Services</h2>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '50px' }}>
-              <p>Loading services...</p>
+            <div className="services-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))' }}>
+              {Array(6).fill(0).map((_, idx) => (
+                <div key={idx} style={{ backgroundColor: 'var(--bg-white)', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
+                  <Skeleton height="200px" borderRadius="0" />
+                  <div style={{ padding: '30px 25px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+                    <Skeleton height="24px" width="60%" />
+                    <Skeleton height="16px" width="90%" />
+                    <Skeleton height="16px" width="80%" />
+                    <Skeleton height="40px" width="140px" borderRadius="8px" style={{ marginTop: '15px' }} />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <motion.div

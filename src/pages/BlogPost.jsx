@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { apiCall } from '../utils/api';
 import { Calendar, ArrowLeft, Share2 } from 'lucide-react';
 import { FiTwitter, FiFacebook, FiLinkedin } from 'react-icons/fi';
+import Skeleton from '../components/Skeleton';
 
 const BlogPost = () => {
   const { id } = useParams();
@@ -81,7 +82,39 @@ const BlogPost = () => {
   };
 
   if (loading) {
-    return <div className="page container" style={{ padding: '6rem 1rem', textAlign: 'center', color: '#6b7280' }}>Loading post...</div>;
+    return (
+      <div className="page" style={{ backgroundColor: '#fdfdfd' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '4rem 1.5rem 2rem 1.5rem' }}>
+          <Skeleton height="20px" width="120px" style={{ marginBottom: '2rem' }} />
+          <Skeleton height="48px" width="100%" style={{ marginBottom: '10px' }} />
+          <Skeleton height="48px" width="70%" style={{ marginBottom: '1.5rem' }} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e5e7eb', paddingBottom: '1.5rem', marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <Skeleton height="48px" width="48px" borderRadius="50%" />
+              <div>
+                <Skeleton height="20px" width="120px" style={{ marginBottom: '5px' }} />
+                <Skeleton height="16px" width="150px" />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <Skeleton height="36px" width="36px" borderRadius="50%" />
+              <Skeleton height="36px" width="36px" borderRadius="50%" />
+              <Skeleton height="36px" width="36px" borderRadius="50%" />
+            </div>
+          </div>
+        </div>
+        <div style={{ maxWidth: '1000px', margin: '0 auto 3rem auto', padding: '0 1.5rem' }}>
+          <Skeleton height="500px" borderRadius="1rem" />
+        </div>
+        <div style={{ maxWidth: '720px', margin: '0 auto', padding: '0 1.5rem 6rem 1.5rem' }}>
+          <Skeleton height="20px" width="100%" style={{ marginBottom: '1rem' }} />
+          <Skeleton height="20px" width="100%" style={{ marginBottom: '1rem' }} />
+          <Skeleton height="20px" width="90%" style={{ marginBottom: '1rem' }} />
+          <Skeleton height="20px" width="95%" style={{ marginBottom: '1rem' }} />
+          <Skeleton height="20px" width="80%" style={{ marginBottom: '1rem' }} />
+        </div>
+      </div>
+    );
   }
 
   if (error || !blog) {

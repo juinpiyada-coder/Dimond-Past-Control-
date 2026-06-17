@@ -3,6 +3,7 @@ import { Package, Calendar, Clock, FileText, CheckCircle, Clock as PendingIcon, 
 import { apiCall } from '../../utils/api';
 import BookingOverview from '../admin-module/BookingOverview';
 import { Link } from 'react-router-dom';
+import Skeleton from '../../components/Skeleton';
 
 const CustomerBookings = ({ user }) => {
   const [bookings, setBookings] = useState([]);
@@ -49,7 +50,34 @@ const CustomerBookings = ({ user }) => {
       </div>
       
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>Loading your bookings...</div>
+        <div style={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#fafbfc' }}>
+                  <th style={{ padding: '16px 24px' }}><Skeleton height="20px" width="100px" /></th>
+                  <th style={{ padding: '16px 24px' }}><Skeleton height="20px" width="100px" /></th>
+                  <th style={{ padding: '16px 24px' }}><Skeleton height="20px" width="100px" /></th>
+                  <th style={{ padding: '16px 24px' }}><Skeleton height="20px" width="80px" /></th>
+                  <th style={{ padding: '16px 24px' }}><Skeleton height="20px" width="80px" /></th>
+                  <th style={{ padding: '16px 24px' }}><Skeleton height="20px" width="80px" /></th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array(5).fill(0).map((_, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '16px 24px' }}><Skeleton height="20px" width="120px" /></td>
+                    <td style={{ padding: '16px 24px' }}><Skeleton height="20px" width="150px" /></td>
+                    <td style={{ padding: '16px 24px' }}><Skeleton height="20px" width="100px" /><Skeleton height="14px" width="60px" style={{ marginTop: '5px' }} /></td>
+                    <td style={{ padding: '16px 24px' }}><Skeleton height="20px" width="60px" /></td>
+                    <td style={{ padding: '16px 24px' }}><Skeleton height="24px" width="80px" borderRadius="12px" /></td>
+                    <td style={{ padding: '16px 24px' }}><Skeleton height="20px" width="80px" /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       ) : error ? (
         <div style={{ backgroundColor: '#fee2e2', color: '#991b1b', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #fca5a5' }}>{error}</div>
       ) : bookings.length === 0 ? (

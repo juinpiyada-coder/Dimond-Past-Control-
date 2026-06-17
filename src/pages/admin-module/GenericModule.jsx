@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiFileText } from 'react-icons/fi';
 import { apiCall } from '../../utils/api';
+import Skeleton from '../../components/Skeleton';
 
 import ServiceDataEntry from './ServiceDataEntry';
 import ServiceImageDataEntry from './ServiceImageDataEntry';
@@ -141,7 +142,35 @@ const GenericModule = ({ moduleKey }) => {
       </div>
 
       {loading && data.length === 0 ? (
-        <div style={{ padding: '4rem', textAlign: 'center', color: '#64748b' }}>Loading {config.name.toLowerCase()}...</div>
+        <div style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', border: '1px solid #f1f5f9' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+              <tr>
+                <th style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="40px" /></th>
+                {config.columns.map(col => (
+                  <th key={col} style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="80px" /></th>
+                ))}
+                <th style={{ padding: '1rem 1.5rem', textAlign: 'right' }}><Skeleton height="20px" width="60px" style={{ marginLeft: 'auto' }} /></th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array(5).fill(0).map((_, idx) => (
+                <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="40px" /></td>
+                  {config.columns.map(col => (
+                    <td key={col} style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="100px" /></td>
+                  ))}
+                  <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                      <Skeleton height="32px" width="32px" borderRadius="6px" />
+                      <Skeleton height="32px" width="32px" borderRadius="6px" />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : error && data.length === 0 ? (
         <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '1rem' }}>{error}</div>
       ) : (

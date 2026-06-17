@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Shield, Bug } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Skeleton from '../components/Skeleton';
 
 const ServiceDetails = () => {
   const { name } = useParams();
@@ -36,8 +37,27 @@ const ServiceDetails = () => {
 
   if (loading) {
     return (
-      <div className="page container" style={{ textAlign: 'center', padding: '100px 0' }}>
-        <h2>Loading service details...</h2>
+      <div className="service-details-page">
+        <div className="page-header" style={{ padding: '60px 0', backgroundColor: 'var(--secondary)' }}>
+          <div className="container">
+            <Skeleton height="48px" width="40%" style={{ marginBottom: '10px' }} />
+            <Skeleton height="20px" width="30%" />
+          </div>
+        </div>
+        <div className="container section-padding">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '50px' }}>
+            <Skeleton height="400px" borderRadius="12px" />
+            <div>
+              <Skeleton height="40px" width="80%" style={{ marginBottom: '20px' }} />
+              <Skeleton height="16px" width="100%" style={{ marginBottom: '10px' }} />
+              <Skeleton height="16px" width="100%" style={{ marginBottom: '10px' }} />
+              <Skeleton height="16px" width="90%" style={{ marginBottom: '30px' }} />
+              <Skeleton height="24px" width="50%" style={{ marginBottom: '20px' }} />
+              <Skeleton height="150px" borderRadius="12px" style={{ marginBottom: '30px' }} />
+              <Skeleton height="50px" width="100%" borderRadius="8px" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

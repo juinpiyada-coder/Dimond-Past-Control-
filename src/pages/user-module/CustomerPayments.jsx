@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CreditCard, FileText } from 'lucide-react';
 import { apiCall } from '../../utils/api';
+import Skeleton from '../../components/Skeleton';
 
 const CustomerPayments = ({ user }) => {
   const [payments, setPayments] = useState([]);
@@ -58,7 +59,30 @@ const CustomerPayments = ({ user }) => {
       </div>
       
       {loading ? (
-        <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Loading payment history...</div>
+        <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+              <tr>
+                <th style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="100px" /></th>
+                <th style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="100px" /></th>
+                <th style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="80px" /></th>
+                <th style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="80px" /></th>
+                <th style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="80px" /></th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array(4).fill(0).map((_, idx) => (
+                <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="60px" /></td>
+                  <td style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="120px" /></td>
+                  <td style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="80px" /></td>
+                  <td style={{ padding: '1rem 1.5rem' }}><Skeleton height="20px" width="60px" /></td>
+                  <td style={{ padding: '1rem 1.5rem' }}><Skeleton height="24px" width="80px" borderRadius="12px" /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : payments.length === 0 ? (
         <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0', padding: '3rem', textAlign: 'center' }}>
           <div style={{ width: '64px', height: '64px', backgroundColor: '#eff6ff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
