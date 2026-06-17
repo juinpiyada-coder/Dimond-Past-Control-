@@ -57,7 +57,6 @@ function App() {
           <Route path="/blog/:id" element={<BlogPost />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/profile" element={<Auth />} />
           <Route path="/bookings" element={<Navigate to="/user-dashboard?tab=bookings" replace />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/reviews" element={<Reviews />} />
@@ -66,6 +65,7 @@ function App() {
 
         {/* Standalone Admin Dashboard Route (No Header/Footer) */}
         <Route path="/dashboard" element={<Suspense fallback={<FifaLoader />}><Dashboard /></Suspense>} />
+        <Route path="/profile" element={<Suspense fallback={<FifaLoader />}><Auth /></Suspense>} />
       </Routes>
     </Router>
   );
