@@ -162,14 +162,36 @@ const GenericModule = ({ moduleKey }) => {
                   <td style={{ padding: '1rem 1.5rem', fontWeight: 500 }}>{item[config.idField]}</td>
                   {config.columns.map(col => {
                     const value = item[col];
-                    if (typeof value === 'string') {
-                      if (value.startsWith('data:image')) {
-                        return (
-                          <td key={col} style={{ padding: '0.5rem 1.5rem' }}>
-                            <img src={value} alt="Preview" style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '0.375rem', border: '1px solid #e2e8f0' }} />
-                          </td>
-                        );
+                    
+                    // Render Image if column implies an image or value is an image URL
+                    const isImageColumn = col.toLowerCase().includes('image') || col.toLowerCase().includes('icon') || col.toLowerCase().includes('logo') || col.toLowerCase().includes('picture');
+                    const isImageUrl = typeof value === 'string' && (value.startsWith('data:image') || value.includes('/image') || value.match(/\.(jpeg|jpg|gif|png|svg|webp)$/i));
+                    
+                    if (isImageColumn || isImageUrl) {
+                      let imgSrc = value;
+                      if (typeof value === 'string' && value.startsWith('/api/')) {
+                        const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+                        const origin = baseUrl ? baseUrl.replace('/api', '') : 'http://localhost:8000';
+                        imgSrc = origin + value;
                       }
+                      
+                      return (
+                        <td key={col} style={{ padding: '0.5rem 1.5rem' }}>
+                          {value ? (
+                            <img 
+                              src={imgSrc} 
+                              alt="Preview" 
+                              style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '0.375rem', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }} 
+                              onError={(e) => { e.target.onerror = null; e.target.src = '/logo1.png'; }} 
+                            />
+                          ) : (
+                            <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>No Image</span>
+                          )}
+                        </td>
+                      );
+                    }
+
+                    if (typeof value === 'string') {
                       if (value.startsWith('data:application/pdf')) {
                         return (
                           <td key={col} style={{ padding: '0.5rem 1.5rem' }}>

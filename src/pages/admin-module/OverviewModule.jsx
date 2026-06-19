@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiCall } from '../../utils/api';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { motion } from 'framer-motion';
 import { FiUsers, FiCalendar, FiDollarSign, FiTrendingUp } from 'react-icons/fi';
 
@@ -147,50 +147,87 @@ const OverviewModule = () => {
       {/* Main Content Split: Chart & Table */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
         
-        {/* Pie Chart Section */}
-        <motion.div variants={itemVariants} style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '1.25rem', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)', border: '1px solid #f1f5f9' }}>
-          <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.125rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            <FiTrendingUp style={{ color: '#2563eb' }} /> Bookings by Status
-          </h3>
-          
-          {bookings_by_status.length > 0 ? (
-            <div style={{ width: '100%', height: 320, position: 'relative' }}>
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie
-                    data={bookings_by_status}
-                    innerRadius={80}
-                    outerRadius={110}
-                    paddingAngle={6}
-                    dataKey="value"
-                    animationBegin={0}
-                    animationDuration={1500}
-                    stroke="none"
-                  >
-                    {bookings_by_status.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} style={{ filter: `drop-shadow(0px 4px 6px rgba(0,0,0,0.1))` }} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    formatter={(value) => [`${value} Bookings`, 'Count']}
-                    contentStyle={{ borderRadius: '0.75rem', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', padding: '1rem' }}
-                    itemStyle={{ fontWeight: 600, color: '#0f172a' }}
-                  />
-                  <Legend 
-                    verticalAlign="bottom" 
-                    height={40} 
-                    iconType="circle"
-                    formatter={(value) => <span style={{ color: '#475569', fontWeight: 500 }}>{value}</span>}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div style={{ height: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
-              No booking data available.
-            </div>
-          )}
-        </motion.div>
+        {/* Charts Section */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {/* Pie Chart Section */}
+          <motion.div variants={itemVariants} style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '1.25rem', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)', border: '1px solid #f1f5f9' }}>
+            <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.125rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <FiTrendingUp style={{ color: '#2563eb' }} /> Bookings by Status (Pie)
+            </h3>
+            
+            {bookings_by_status.length > 0 ? (
+              <div style={{ width: '100%', height: 320, position: 'relative' }}>
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={bookings_by_status.map(b => ({ name: b.status || b.name || 'Unknown', value: Number(b.count || b.value || 0) }))}
+                      innerRadius={80}
+                      outerRadius={110}
+                      paddingAngle={6}
+                      dataKey="value"
+                      nameKey="name"
+                      animationBegin={0}
+                      animationDuration={1500}
+                      stroke="none"
+                    >
+                      {bookings_by_status.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} style={{ filter: `drop-shadow(0px 4px 6px rgba(0,0,0,0.1))` }} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value) => [`${value} Bookings`, 'Count']}
+                      contentStyle={{ borderRadius: '0.75rem', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', padding: '1rem' }}
+                      itemStyle={{ fontWeight: 600, color: '#0f172a' }}
+                    />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={40} 
+                      iconType="circle"
+                      formatter={(value) => <span style={{ color: '#475569', fontWeight: 500 }}>{value}</span>}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div style={{ height: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                No booking data available.
+              </div>
+            )}
+          </motion.div>
+
+          {/* Bar Chart Section */}
+          <motion.div variants={itemVariants} style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '1.25rem', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)', border: '1px solid #f1f5f9' }}>
+            <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.125rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <FiTrendingUp style={{ color: '#f59e0b' }} /> Bookings by Status (Bar)
+            </h3>
+            
+            {bookings_by_status.length > 0 ? (
+              <div style={{ width: '100%', height: 320, position: 'relative' }}>
+                <ResponsiveContainer>
+                  <BarChart data={bookings_by_status.map(b => ({ name: b.status || b.name || 'Unknown', value: Number(b.count || b.value || 0) }))}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                    <Tooltip 
+                      cursor={{ fill: '#f8fafc' }}
+                      contentStyle={{ borderRadius: '0.75rem', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', padding: '1rem' }}
+                      itemStyle={{ fontWeight: 600, color: '#0f172a' }}
+                    />
+                    <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} animationDuration={1500}>
+                      {bookings_by_status.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div style={{ height: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                No booking data available.
+              </div>
+            )}
+          </motion.div>
+        </div>
 
         {/* Recent Activity Table */}
         <motion.div variants={itemVariants} style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '1.25rem', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)', border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column' }}>

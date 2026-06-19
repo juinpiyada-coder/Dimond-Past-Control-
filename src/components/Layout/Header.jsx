@@ -1,7 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, Menu, User, ChevronDown, CheckCircle } from 'lucide-react';
-import { MenuContext, SettingsContext } from '../../App';
+import { FiFacebook } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { SettingsContext } from '../../App';
+import { apiCall } from '../../utils/api';
 import FifaLoader from '../FifaLoader';
 
 const Header = () => {
@@ -9,366 +12,223 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || 'null');
-  const menus = useContext(MenuContext);
   const settings = useContext(SettingsContext);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [allData, setAllData] = useState({ services: [], blogs: [], pages: [] });
   
-  const headerMenus = menus.filter(m => m.menu_location === 'HEADER' && m.is_active === 1).sort((a, b) => a.order_index - b.order_index);
+  const headerMenus = [
+    { menu_id: 1, label: 'Home', url: '/' },
+    { menu_id: 2, label: 'About Us', url: '/about' },
+    { menu_id: 3, label: 'Services', url: '/services' },
+    { menu_id: 7, label: 'Blog', url: '/blog' },
+    { menu_id: 5, label: 'Our Clients', url: '/clients' },
+    { menu_id: 4, label: 'Contact', url: '/contact' }
+  ];
+
+  React.useEffect(() => {
+    const fetchSearchData = async () => {
+      try {
+        const [servicesRes, blogsRes] = await Promise.all([
+          apiCall('/services').catch(() => []),
+          apiCall('/blogs').catch(() => [])
+        ]);
+        setAllData({ 
+          services: Array.isArray(servicesRes) ? servicesRes : [], 
+          blogs: Array.isArray(blogsRes) ? blogsRes : [], 
+          pages: headerMenus 
+        });
+      } catch (err) {
+        console.error('Failed to fetch search data', err);
+      }
+    };
+    fetchSearchData();
+  }, []);
+
+  React.useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+    const q = searchQuery.toLowerCase();
+    
+    const matchedPages = allData.pages
+      .filter(p => p.label.toLowerCase().includes(q))
+      .map(p => ({ label: p.label, url: p.url, type: 'Page' }));
+      
+    const matchedServices = allData.services
+      .filter(s => s.name?.toLowerCase().includes(q) || s.short_description?.toLowerCase().includes(q))
+      .map(s => ({ label: s.name, url: `/service/${s.name.toLowerCase().replace(/\s+/g, '-')}`, type: 'Service' }));
+      
+    const matchedBlogs = allData.blogs
+      .filter(b => b.title?.toLowerCase().includes(q) || b.excerpt?.toLowerCase().includes(q))
+      .map(b => ({ label: b.title, url: `/blog/${b.id}`, type: 'Blog' }));
+
+    setSearchResults([...matchedPages, ...matchedServices, ...matchedBlogs].slice(0, 8)); // Max 8 results
+    setShowResults(true);
+  }, [searchQuery, allData]);
 
   const handleNavigation = (e, url) => {
-    e.preventDefault();
-    if (settings.enable_fifa_loader === 'true') {
-      setIsNavigating(true);
-      setTimeout(() => {
-        setIsNavigating(false);
-        setIsMobileMenuOpen(false);
-        navigate(url);
-      }, 800);
-    } else {
+    if (e) e.preventDefault();
+    setIsNavigating(true);
+    setShowResults(false);
+    setSearchQuery('');
+    setTimeout(() => {
+      setIsNavigating(false);
       setIsMobileMenuOpen(false);
       navigate(url);
-    }
+    }, 800);
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
+    if (searchResults.length > 0) {
+      handleNavigation(null, searchResults[0].url);
+    } else if (searchQuery.trim()) {
       navigate(`/services?q=${encodeURIComponent(searchQuery)}`);
+      setShowResults(false);
+      setSearchQuery('');
     }
   };
 
   return (
     <>
     {isNavigating && <FifaLoader />}
-    <header className="amazon-header">
-      {/* CSS in JS for the specific Amazon layout */}
-      <style>{`
-        :root {
-          --header-height: 105px !important;
-        }
-        .amazon-header {
-          background: linear-gradient(135deg, var(--secondary, #2A329F) 0%, #1e3a8a 60%, #dca800 100%);
-          color: white;
-          position: fixed;
-          top: 0; left: 0; right: 0;
-          z-index: 1000;
-          font-family: inherit;
-        }
-        .amazon-header a {
-          color: white;
-          text-decoration: none;
-        }
-        .amz-nav-belt {
-          display: flex;
-          align-items: center;
-          padding: 10px 20px;
-          gap: 20px;
-          min-height: 80px;
-        }
-        .amz-logo-link {
-          display: flex;
-          align-items: center;
-          padding: 5px;
-          border: 1px solid transparent;
-          border-radius: 2px;
-        }
-        .amz-logo-link:hover {
-          border-color: white;
-        }
-        .amz-logo-img {
-          height: 55px;
-          object-fit: contain;
-        }
-        .amz-search-bar {
-          flex-grow: 1;
-          display: flex;
-          border-radius: 4px;
-          overflow: hidden;
-          background-color: white;
-          height: 40px;
-        }
-        .amz-search-input {
-          flex-grow: 1;
-          padding: 0 15px;
-          border: none;
-          outline: none;
-          color: black;
-          font-size: 1rem;
-        }
-        .amz-search-btn {
-          background-color: var(--primary, #FFEE00);
-          border: none;
-          padding: 0 15px;
-          cursor: pointer;
-          color: #333;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .amz-search-btn:hover {
-          background-color: var(--primary-hover, #e5d600);
-        }
-        .amz-nav-tools {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-        .amz-nav-item {
-          display: flex;
-          flex-direction: column;
-          padding: 8px;
-          border: 1px solid transparent;
-          border-radius: 2px;
-          cursor: pointer;
-        }
-        .amz-nav-item:hover {
-          border-color: white;
-        }
-        .amz-nav-line-1 {
-          font-size: 0.75rem;
-          line-height: 14px;
-          white-space: nowrap;
-        }
-        .amz-nav-line-2 {
-          font-size: 0.85rem;
-          font-weight: 700;
-          display: flex;
-          align-items: center;
-          line-height: 15px;
-          white-space: nowrap;
-        }
-        .amz-nav-main {
-          background-color: var(--secondary-hover, #222880);
-          display: flex;
-          padding: 5px 20px;
-          align-items: center;
-          gap: 10px;
-          overflow-x: auto;
-          white-space: nowrap;
-          height: 40px;
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .amz-nav-main::-webkit-scrollbar {
-          display: none;
-        }
-        .amz-bottom-link {
-          padding: 8px 10px;
-          border: 1px solid transparent;
-          border-radius: 2px;
-          font-size: 0.9rem;
-          font-weight: 500;
-          display: flex;
-          align-items: center;
-          gap: 5px;
-        }
-        .amz-bottom-link:hover {
-          border-color: white;
-        }
-        .amz-cart-btn {
-          display: flex;
-          flex-direction: row !important;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          background-color: var(--primary, #FFEE00);
-          color: #111 !important;
-          padding: 0 20px !important;
-          height: 42px;
-          border-radius: 4px;
-          font-weight: 800;
-          font-size: 1rem;
-          white-space: nowrap;
-          border: none !important;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .amz-cart-btn:hover {
-          background-color: #facc15;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-          transform: translateY(-1px);
-        }
-        
-        .user-avatar {
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          background-color: #f1f5f9;
-          color: #0f172a;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: bold;
-          font-size: 0.9rem;
-          margin-right: 8px;
-        }
-
-        .mobile-only {
-          display: none;
-        }
-
-        @media (max-width: 768px) {
-          :root {
-            --header-height: 110px !important;
-          }
-          .amz-nav-belt {
-            flex-wrap: wrap;
-            padding: 10px 15px;
-            height: auto;
-          }
-          .amz-logo-link {
-            padding: 0;
-            max-width: 70%;
-          }
-          .amz-logo-img {
-            height: 55px; /* Make logo bigger */
-          }
-          .amz-search-bar {
-            order: 3;
-            width: 100%;
-            margin-top: 10px;
-            height: 42px;
-          }
-          .amz-nav-tools {
-            gap: 10px;
-            margin-left: auto;
-          }
-          .amz-nav-item {
-            padding: 4px;
-          }
-          .amz-cart-btn {
-            height: 38px;
-            padding: 0 15px !important;
-            border-radius: 6px;
-          }
-          .desktop-only {
-            display: none !important;
-          }
-          .mobile-only {
-            display: flex;
-          }
-          .amz-nav-main {
-            display: none !important; /* Hide ugly scroll menu on mobile */
-          }
-        }
-        @media (max-width: 480px) {
-          :root {
-            --header-height: 105px !important;
-          }
-          .amz-logo-img {
-            height: 50px;
-          }
-        }
-      `}</style>
-
+    <header className="ecom-header" style={{ position: 'relative' }}>
+      {/* Football Animation Container */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
+        <motion.div
+          style={{ position: 'absolute', top: '50%', marginTop: '-12px', fontSize: '24px' }}
+          initial={{ left: '-50px', rotate: 0 }}
+          animate={{ left: '100%', rotate: 720 }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+        >
+          ⚽
+        </motion.div>
+      </div>
+      
       {/* Top Bar (Nav Belt) */}
-      <div className="amz-nav-belt">
+      <div className="ecom-nav-belt">
         {/* Mobile Hamburger */}
         <div className="mobile-only" style={{ cursor: 'pointer', marginRight: '10px' }} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
           <Menu size={28} />
         </div>
 
         {/* Logo */}
-        <Link to="/" className="amz-logo-link" style={{ position: 'relative' }}>
-          <style>{`
-            @keyframes rollFootballMobile {
-              0% { transform: translateX(-20px) rotate(0deg); opacity: 0; }
-              15% { opacity: 1; }
-              85% { opacity: 1; }
-              100% { transform: translateX(180px) rotate(360deg); opacity: 0; }
-            }
-            @keyframes rollFootballDesktop {
-              0% { transform: translateX(-20px) rotate(0deg); opacity: 0; }
-              10% { opacity: 1; }
-              90% { opacity: 1; }
-              100% { transform: translateX(300px) rotate(360deg); opacity: 0; }
-            }
-            .fifa-football-anim {
-              position: absolute;
-              bottom: 8px;
-              left: 0;
-              font-size: 20px;
-              animation: rollFootballMobile 4s linear infinite;
-              pointer-events: none;
-              z-index: 5;
-              filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
-            }
-            @media (min-width: 769px) {
-              .fifa-football-anim {
-                animation: rollFootballDesktop 5s linear infinite;
-                font-size: 24px;
-                bottom: 12px;
-              }
-            }
-            @keyframes shimmerText {
-              0% { background-position: -200% center; }
-              100% { background-position: 200% center; }
-            }
-            .animated-logo-text {
-              background: linear-gradient(
-                to right,
-                #ffffff 20%,
-                #ffee00 40%,
-                #ffee00 60%,
-                #ffffff 80%
-              );
-              background-size: 200% auto;
-              color: transparent;
-              -webkit-background-clip: text;
-              background-clip: text;
-              animation: shimmerText 3s linear infinite;
-              display: inline-block;
-            }
-          `}</style>
-          <img src="/logo1.png" alt="Diamond Pest Control Logo" className="amz-logo-img" style={{ position: 'relative', zIndex: 10 }} />
-          <span className="desktop-only animated-logo-text" style={{ fontSize: '1.3rem', fontWeight: 'bold', marginLeft: '10px', position: 'relative', zIndex: 10 }}>Diamond Pest Control</span>
-          <div className="fifa-football-anim" title="FIFA World Cup 2026">⚽</div>
+        <Link to="/" className="ecom-logo-link" style={{ position: 'relative', display: 'flex', alignItems: 'center' }} onClick={(e) => handleNavigation(e, '/')}>
+          <motion.img 
+            src="/logo1.png" 
+            alt="Diamond Pest Control Logo" 
+            className="ecom-logo-img" 
+            style={{ position: 'relative', zIndex: 10 }} 
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          />
+          <motion.span 
+            className="desktop-only" 
+            style={{ fontSize: '1.3rem', fontWeight: 'bold', marginLeft: '10px', position: 'relative', zIndex: 10, display: 'inline-block' }}
+            initial={{ opacity: 0, scale: 1.3, x: -10 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+          >
+            Diamond Pest Control
+          </motion.span>
         </Link>
 
         {/* Search Bar */}
-        <form className="amz-search-bar" onSubmit={handleSearch}>
-          <input 
-            type="text" 
-            className="amz-search-input" 
-            placeholder="Search for pest control services..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <button type="submit" className="amz-search-btn" aria-label="Search">
-            <Search size={22} />
-          </button>
-        </form>
+        <div style={{ position: 'relative', flex: 1, maxWidth: '600px', margin: '0 20px' }}>
+          <form className="ecom-search-bar" onSubmit={handleSearch} style={{ margin: 0, width: '100%' }}>
+            <input 
+              type="text" 
+              className="ecom-search-input" 
+              placeholder="Search for services, blogs, or pages..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => { if (searchQuery.trim()) setShowResults(true); }}
+              onBlur={() => setTimeout(() => setShowResults(false), 200)}
+            />
+            <button type="submit" className="ecom-search-btn" aria-label="Search">
+              <Search size={22} />
+            </button>
+          </form>
+
+          {/* Search Results Dropdown */}
+          <AnimatePresence>
+            {showResults && searchResults.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                style={{ 
+                  position: 'absolute', 
+                  top: '100%', 
+                  left: 0, 
+                  right: 0, 
+                  backgroundColor: 'white', 
+                  borderRadius: '0.5rem', 
+                  boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)', 
+                  marginTop: '0.5rem', 
+                  zIndex: 50,
+                  overflow: 'hidden',
+                  border: '1px solid #e2e8f0'
+                }}
+              >
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, maxHeight: '350px', overflowY: 'auto' }}>
+                  {searchResults.map((result, idx) => (
+                    <li key={idx} style={{ borderBottom: idx < searchResults.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                      <Link 
+                        to={result.url} 
+                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', textDecoration: 'none', color: '#0f172a', transition: 'background-color 0.2s' }}
+                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
+                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                        onClick={(e) => handleNavigation(e, result.url)}
+                      >
+                        <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>{result.label}</span>
+                        <span style={{ fontSize: '0.75rem', backgroundColor: '#e2e8f0', color: '#475569', padding: '0.2rem 0.5rem', borderRadius: '1rem', fontWeight: 600 }}>{result.type}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Right Tools */}
-        <div className="amz-nav-tools">
+        <div className="ecom-nav-tools">
           {/* Account */}
-          <Link to={user ? (user.role === 'ADMIN' ? '/dashboard' : '/user-dashboard') : '/profile'} className="amz-nav-item">
+          <Link to={user ? (user.role === 'ADMIN' ? '/dashboard' : '/user-dashboard') : '/profile'} className="ecom-nav-item" onClick={(e) => handleNavigation(e, user ? (user.role === 'ADMIN' ? '/dashboard' : '/user-dashboard') : '/profile')}>
             {user ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div className="user-avatar">{user.full_name ? user.full_name.charAt(0).toUpperCase() : <User size={16} />}</div>
                 <div className="desktop-only">
-                  <span className="amz-nav-line-1">Hello, {user.full_name ? user.full_name.split(' ')[0] : 'User'}</span>
-                  <span className="amz-nav-line-2">Account & Lists <ChevronDown size={14} style={{ marginLeft: '2px' }} /></span>
+                  <span className="ecom-nav-line-1">Hello, {user.full_name ? user.full_name.split(' ')[0] : 'User'}</span>
+                  <span className="ecom-nav-line-2">Account & Lists <ChevronDown size={14} style={{ marginLeft: '2px' }} /></span>
                 </div>
               </div>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div className="mobile-only"><User size={24} /></div>
                 <div className="desktop-only">
-                  <span className="amz-nav-line-1">Hello, sign in</span>
-                  <span className="amz-nav-line-2">Account & Lists <ChevronDown size={14} style={{ marginLeft: '2px' }} /></span>
+                  <span className="ecom-nav-line-1">Hello, sign in</span>
+                  <span className="ecom-nav-line-2">Account & Lists <ChevronDown size={14} style={{ marginLeft: '2px' }} /></span>
                 </div>
               </div>
             )}
           </Link>
 
           {/* Bookings / Returns */}
-          <Link to={user ? '/bookings' : '/profile'} className="amz-nav-item desktop-only">
-            <span className="amz-nav-line-1">Returns</span>
-            <span className="amz-nav-line-2">& Bookings</span>
+          <Link to={user ? '/bookings' : '/profile'} className="ecom-nav-item desktop-only" onClick={(e) => handleNavigation(e, user ? '/bookings' : '/profile')}>
+            <span className="ecom-nav-line-1">Returns</span>
+            <span className="ecom-nav-line-2">& Bookings</span>
           </Link>
 
           {/* Book Now (Cart Equivalent) */}
-          <Link to="/book" className="amz-nav-item amz-cart-btn">
+          <Link to="/book" className="ecom-nav-item ecom-cart-btn" onClick={(e) => handleNavigation(e, '/book')}>
             <ShoppingCart size={22} className="desktop-only" />
             <CheckCircle size={22} className="mobile-only" />
             <span className="desktop-only" style={{ fontSize: '1rem' }}>Book Now</span>
@@ -377,16 +237,16 @@ const Header = () => {
       </div>
 
       {/* Bottom Bar (Nav Main) */}
-      <div className="amz-nav-main">
+      <div className="ecom-nav-main">
         <div 
-          className="amz-bottom-link" 
+          className="ecom-bottom-link" 
           style={{ cursor: 'pointer' }}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           <Menu size={20} /> All
         </div>
         {headerMenus.map(menu => (
-          <a key={menu.menu_id} href={menu.url} onClick={(e) => handleNavigation(e, menu.url)} className="amz-bottom-link">{menu.label}</a>
+          <a key={menu.menu_id} href={menu.url} onClick={(e) => handleNavigation(e, menu.url)} className="ecom-bottom-link">{menu.label}</a>
         ))}
       </div>
 
@@ -402,10 +262,10 @@ const Header = () => {
             Hello, {user ? (user.full_name ? user.full_name.split(' ')[0] : 'User') : 'sign in'}
           </div>
           {headerMenus.map(menu => (
-            <a key={menu.menu_id} href={menu.url} className="amz-bottom-link" style={{ color: '#111', padding: '15px 20px', borderBottom: '1px solid #f1f5f9' }} onClick={(e) => handleNavigation(e, menu.url)}>{menu.label}</a>
+            <a key={menu.menu_id} href={menu.url} className="ecom-bottom-link" style={{ color: '#111', padding: '15px 20px', borderBottom: '1px solid #f1f5f9' }} onClick={(e) => handleNavigation(e, menu.url)}>{menu.label}</a>
           ))}
-          <a href="/book" className="amz-bottom-link" style={{ color: '#111', padding: '15px 20px', borderBottom: '1px solid #f1f5f9' }} onClick={(e) => handleNavigation(e, '/book')}>Book Now</a>
-          <a href={user ? (user.role === 'ADMIN' ? '/dashboard' : '/user-dashboard') : '/profile'} className="amz-bottom-link" style={{ color: '#111', padding: '15px 20px' }} onClick={(e) => handleNavigation(e, user ? (user.role === 'ADMIN' ? '/dashboard' : '/user-dashboard') : '/profile')}>Your Account</a>
+          <a href="/book" className="ecom-bottom-link" style={{ color: '#111', padding: '15px 20px', borderBottom: '1px solid #f1f5f9' }} onClick={(e) => handleNavigation(e, '/book')}>Book Now</a>
+          <a href={user ? (user.role === 'ADMIN' ? '/dashboard' : '/user-dashboard') : '/profile'} className="ecom-bottom-link" style={{ color: '#111', padding: '15px 20px' }} onClick={(e) => handleNavigation(e, user ? (user.role === 'ADMIN' ? '/dashboard' : '/user-dashboard') : '/profile')}>Your Account</a>
         </div>
       )}
     </header>

@@ -21,18 +21,24 @@ import Rodents from './pages/service-module/Rodents';
 import Mosquitoes from './pages/service-module/Mosquitoes';
 import Ants from './pages/service-module/Ants';
 import WoodBorer from './pages/service-module/WoodBorer';
+import BirdControl from './pages/service-module/BirdControl';
+import FlyControl from './pages/service-module/FlyControl';
+import Commercial from './pages/service-module/Commercial';
+import General from './pages/service-module/General';
+import HomeService from './pages/service-module/HomeService';
 
 import BlogList from './pages/BlogList';
 import BlogPost from './pages/BlogPost';
 import UserDashboard from './pages/user-module/UserDashboard';
 
 import AboutUs from './pages/AboutUs';
+import Contact from './pages/Contact';
+import OurClients from './pages/OurClients';
 
 // Placeholder Pages
 const Pricing = () => <div className="page container"><h1 className="section-title">Pricing</h1></div>;
 const PestGuide = () => <div className="page container"><h1 className="section-title">Pest Identification Guide</h1></div>;
 const FAQ = () => <div className="page container"><h1 className="section-title">FAQ</h1></div>;
-const Contact = () => <div className="page container"><h1 className="section-title">Contact Us</h1></div>;
 const Payment = () => <div className="page container"><h1 className="section-title">Payment Page</h1></div>;
 const Reviews = () => <div className="page container"><h1 className="section-title">Reviews</h1></div>;
 
@@ -88,6 +94,7 @@ function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/services" element={<Services />} />
           <Route path="/all-services" element={<AllServices />} />
+          <Route path="/clients" element={<OurClients />} />
           
           {/* Static Core Service Pages */}
           <Route path="/service/cockroaches" element={<Cockroaches />} />
@@ -97,6 +104,11 @@ function App() {
           <Route path="/service/mosquitoes" element={<Mosquitoes />} />
           <Route path="/service/ants" element={<Ants />} />
           <Route path="/service/wood-borer" element={<WoodBorer />} />
+          <Route path="/service/bird-control" element={<BirdControl />} />
+          <Route path="/service/fly-control" element={<FlyControl />} />
+          <Route path="/service/commercial" element={<Commercial />} />
+          <Route path="/service/general" element={<General />} />
+          <Route path="/service/home-service" element={<HomeService />} />
           
           <Route path="/service/:name" element={<ServiceDetails />} />
           <Route path="/book" element={<BookService />} />
@@ -110,11 +122,11 @@ function App() {
           <Route path="/payment" element={<Payment />} />
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/profile" element={<Auth />} />
         </Route>
 
         {/* Standalone Admin Dashboard Route (No Header/Footer) */}
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<Auth />} />
       </Routes>
     </Router>
     </MenuContext.Provider>

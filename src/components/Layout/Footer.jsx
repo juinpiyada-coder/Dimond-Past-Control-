@@ -2,6 +2,8 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { FiFacebook, FiTwitter, FiYoutube, FiLinkedin } from 'react-icons/fi';
+import { GiDragonHead } from 'react-icons/gi';
+import { motion } from 'framer-motion';
 import { MenuContext } from '../../App';
 
 const Footer = () => {
@@ -19,10 +21,10 @@ const Footer = () => {
             Trusted Pest Control Services You Can Rely On. Welcome to Diamond Pest Control — your trusted partner for safe, effective, and long-lasting pest management solutions.
           </p>
           <div className="social-links" style={{ display: 'flex', gap: '1rem' }}>
-            <a href="#" className="social-icon" style={{ color: 'white', backgroundColor: '#334155', padding: '0.5rem', borderRadius: '50%', display: 'flex' }}><FiFacebook size={18} /></a>
-            <a href="#" className="social-icon" style={{ color: 'white', backgroundColor: '#334155', padding: '0.5rem', borderRadius: '50%', display: 'flex' }}><FiTwitter size={18} /></a>
-            <a href="#" className="social-icon" style={{ color: 'white', backgroundColor: '#334155', padding: '0.5rem', borderRadius: '50%', display: 'flex' }}><FiYoutube size={18} /></a>
-            <a href="#" className="social-icon" style={{ color: 'white', backgroundColor: '#334155', padding: '0.5rem', borderRadius: '50%', display: 'flex' }}><FiLinkedin size={18} /></a>
+            <motion.a href="#" whileHover={{ scale: 1.1, backgroundColor: '#3b5998' }} transition={{ duration: 0.2 }} className="social-icon" style={{ color: 'white', backgroundColor: '#334155', padding: '0.5rem', borderRadius: '50%', display: 'flex' }}><FiFacebook size={18} /></motion.a>
+            <motion.a href="#" whileHover={{ scale: 1.1, backgroundColor: '#1da1f2' }} transition={{ duration: 0.2 }} className="social-icon" style={{ color: 'white', backgroundColor: '#334155', padding: '0.5rem', borderRadius: '50%', display: 'flex' }}><FiTwitter size={18} /></motion.a>
+            <motion.a href="#" whileHover={{ scale: 1.1, backgroundColor: '#ff0000' }} transition={{ duration: 0.2 }} className="social-icon" style={{ color: 'white', backgroundColor: '#334155', padding: '0.5rem', borderRadius: '50%', display: 'flex' }}><FiYoutube size={18} /></motion.a>
+            <motion.a href="#" whileHover={{ scale: 1.1, backgroundColor: '#0077b5' }} transition={{ duration: 0.2 }} className="social-icon" style={{ color: 'white', backgroundColor: '#334155', padding: '0.5rem', borderRadius: '50%', display: 'flex' }}><FiLinkedin size={18} /></motion.a>
           </div>
         </div>
         
@@ -56,11 +58,19 @@ const Footer = () => {
       </div>
       <div className="footer-bottom" style={{ borderTop: '1px solid #334155', padding: '1.5rem 0', marginTop: '3rem' }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-          <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.875rem' }}>Copyright © 2026 Diamond Pest Control Pvt, All rights reserved. Powered by Globeforge</p>
-          <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.875rem' }}>
-            <Link to="/terms" style={{ color: '#94a3b8', textDecoration: 'none' }}>Term of use</Link>
-            <Link to="/privacy" style={{ color: '#94a3b8', textDecoration: 'none' }}>Privacy Policy</Link>
-            <Link to="/cookie" style={{ color: '#94a3b8', textDecoration: 'none' }}>Cookie Policy</Link>
+          <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.875rem' }}>Copyright © {new Date().getFullYear()} Diamond Pest Control, All rights reserved.</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+            <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              Created and maintained by  
+              <motion.span 
+                whileHover={{ rotate: [0, 15, -15, 10, -10, 0], scale: 1.05 }} 
+                transition={{ duration: 0.6 }}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', fontWeight: 'bold', cursor: 'pointer' }}
+              >
+                Globeforge
+                <GiDragonHead size={20} />
+              </motion.span>
+            </p>
           </div>
         </div>
       </div>

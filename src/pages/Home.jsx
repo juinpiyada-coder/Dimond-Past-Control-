@@ -1,48 +1,84 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home as HomeIcon, Video, Grid, User, ShoppingCart, MapPin, Search, Menu, X, ArrowRight, Bug, Activity, Shield, Clock, ThumbsUp, Star, ChevronDown, CheckCircle2, PhoneCall, Quote } from 'lucide-react';
+import { Home as HomeIcon, Video, Grid, User, ShoppingCart, MapPin, Search, Menu, X, ArrowRight, Bug, Activity, Shield, Clock, ThumbsUp, Star, ChevronDown, CheckCircle2, PhoneCall, Quote, Building, Bird } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { GiRat, GiAnt } from 'react-icons/gi';
 import { FaBug, FaBugs, FaMosquito, FaLocust } from 'react-icons/fa6';
 import { FaBed } from 'react-icons/fa';
+import { useQuery } from '@tanstack/react-query';
 import { apiCall } from '../utils/api';
 
+import slider1 from '../assets/slider/slider-1.png';
+import slider2 from '../assets/slider/slider-2.png';
+import slider3 from '../assets/slider/slider-3.png';
+import slider4 from '../assets/slider/slider-4.png';
+import slider5 from '../assets/slider/slider-5.png';
+
+const AnimatedCounter = ({ end, suffix = '' }) => {
+  const [count, setCount] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+  const nodeRef = React.useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasStarted) {
+          setHasStarted(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (nodeRef.current) observer.observe(nodeRef.current);
+    return () => observer.disconnect();
+  }, [hasStarted]);
+
+  useEffect(() => {
+    if (!hasStarted) return;
+    let startTimestamp = null;
+    const duration = 2000;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      // Use easeOut cubic easing for a smoother finish
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(easeOut * end));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [hasStarted, end]);
+
+  return <span ref={nodeRef}>{count}{suffix}</span>;
+};
+
 const Home = () => {
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
+  const sliderImages = [slider1, slider2, slider3, slider4, slider5];
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const servicesPerPage = 6;
+
   useEffect(() => {
-    const cachedServices = localStorage.getItem('services');
-    const cacheTime = localStorage.getItem('services_time');
-
-    const FIVE_MINUTES = 5 * 60 * 1000;
-
-    if (
-      cachedServices &&
-      cacheTime &&
-      Date.now() - Number(cacheTime) < FIVE_MINUTES
-    ) {
-      setServices(JSON.parse(cachedServices));
-      setLoading(false);
-      return;
-    }
-
-    apiCall('/services')
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setServices(data);
-          localStorage.setItem('services', JSON.stringify(data));
-          localStorage.setItem('services_time', Date.now().toString());
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to fetch services", err);
-        setLoading(false);
-      });
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % sliderImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
   }, []);
+
+
+  const { data: services = [], isLoading: loading } = useQuery({
+    queryKey: ['services'],
+    queryFn: async () => {
+      const data = await apiCall('/services');
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   const pestCategories = [
     { name: "Cockroaches", path: "cockroaches", icon: <FaBugs size={32} color="#2A329F" /> },
@@ -52,6 +88,11 @@ const Home = () => {
     { name: "Mosquitoes", path: "mosquitoes", icon: <FaMosquito size={32} color="#2A329F" /> },
     { name: "Ants", path: "ants", icon: <GiAnt size={32} color="#2A329F" /> },
     { name: "Wood Borer", path: "wood-borer", icon: <FaLocust size={32} color="#2A329F" /> },
+    { name: "Bird Control", path: "bird-control", icon: <Bird size={32} color="#2A329F" /> },
+    { name: "Fly Control", path: "fly-control", icon: <FaBug size={32} color="#2A329F" /> },
+    { name: "Commercial", path: "commercial", icon: <Building size={32} color="#2A329F" /> },
+    { name: "General", path: "general", icon: <Shield size={32} color="#2A329F" /> },
+    { name: "Home Service", path: "home-service", icon: <HomeIcon size={32} color="#2A329F" /> },
   ];
 
 
@@ -83,6 +124,16 @@ const Home = () => {
   const fadeInLeft = { hidden: { opacity: 0, x: -50 }, visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } } };
   const fadeInRight = { hidden: { opacity: 0, x: 50 }, visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } } };
   const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.2 } } };
+
+  // Pagination calculations
+  const indexOfLastService = currentPage * servicesPerPage;
+  const indexOfFirstService = indexOfLastService - servicesPerPage;
+  const currentServices = services.slice(indexOfFirstService, indexOfLastService);
+  const totalPages = Math.ceil(services.length / servicesPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="fk-home-container">
@@ -150,72 +201,133 @@ const Home = () => {
         ))}
       </div>
 
-      {/* Promotional Banner */}
-      <div className="fk-promo-banner-container">
-        <div className="fk-promo-banner">
-          <img src="/WhatsApp-Image-2026-05-21-at-4.46.12-PM.jpeg" alt="Pest Control Sale" style={{ height: '200px', objectFit: 'cover' }} />
-          <div style={{ position: 'absolute', top: '20px', left: '20px', background: 'rgba(255,238,0,0.9)', padding: '10px 15px', borderRadius: '8px' }}>
-            <h2 style={{ margin: 0, fontSize: '1.4rem', color: '#111' }}>Epic Monsoon Sale</h2>
-            <p style={{ margin: '5px 0 0 0', fontWeight: 'bold', color: '#c40000' }}>Flat ₹500 Off*</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Yellow Deals Section */}
-      <div className="fk-yellow-deals-section">
-        <div className="fk-deals-header">
-          <span className="fk-deals-title">Top Pest Treatments</span>
-          <Link to="/services" style={{ background: '#2874f0', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            View All <ArrowRight size={14} />
-          </Link>
-        </div>
-        <div className="fk-deals-scroll">
-          {services.slice(0, 5).map((service, idx) => (
-            <div key={idx} className="fk-deal-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
-              <img
-                src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')}
-                alt={service.service_name}
-                className="fk-deal-card-img"
-                onError={(e) => { e.target.onerror = null; e.target.src = '/logo.png'; }}
-              />
-              <span className="fk-deal-card-title">{service.service_name}</span>
-              <span className="fk-deal-card-action">Book Now</span>
-            </div>
-          ))
-          }
-        </div>
-      </div>
-
-      {/* Suggested For You Grid */}
-      <div className="fk-suggested-section">
-        <div className="fk-suggested-header">
-          Suggested For You
-          <span style={{ fontSize: '0.8rem', color: '#878787', fontWeight: 'normal' }}>Sponsored</span>
-        </div>
-        <div className="fk-suggested-grid">
-          {services.map((service, idx) => (
-            <div key={idx} className="fk-suggested-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
-              <div className="fk-suggested-card-img-wrapper">
-                <img
-                  src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')}
-                  alt={service.service_name}
-                  className="fk-suggested-card-img"
-                  onError={(e) => { e.target.onerror = null; e.target.src = '/logo.png'; }}
-                />
-              </div>
-              <div className="fk-suggested-card-body">
-                <div className="fk-suggested-card-title">{service.service_name} Treatment</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  <span style={{ fontWeight: 'bold', color: '#212121' }}>₹{service.base_price}</span>
-                  <span style={{ fontSize: '0.75rem', color: '#878787', textDecoration: 'line-through' }}>₹{service.base_price + 500}</span>
-                </div>
-              </div>
-            </div>
+      {/* Hero Slider */}
+      <div className="hero-slider-container">
+        {sliderImages.map((img, index) => (
+          <img 
+            key={index}
+            src={img}
+            alt={`Slide ${index + 1}`}
+            className="hero-slider-img"
+            style={{ opacity: currentSlide === index ? 1 : 0 }}
+          />
+        ))}
+        {/* Slider Dots */}
+        <div className="hero-slider-dots">
+          {sliderImages.map((_, index) => (
+            <div 
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className="slider-dot"
+              style={{
+                backgroundColor: currentSlide === index ? 'var(--primary, #FFEE00)' : 'rgba(255,255,255,0.6)',
+                transform: currentSlide === index ? 'scale(1.2)' : 'scale(1)',
+              }}
+            />
           ))}
         </div>
       </div>
 
 
+
+      {/* Custom Products Section */}
+      <section className="custom-services-section" style={{ padding: '60px 20px', backgroundColor: '#f8fafc' }}>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <motion.h4 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ color: 'var(--secondary, #2A329F)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '10px', fontSize: '0.9rem' }}>Our Services</motion.h4>
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} style={{ fontSize: '2.4rem', color: '#1e293b', fontWeight: '800', lineHeight: 1.2 }}>Premium Pest Control Services</motion.h2>
+          <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} style={{ color: '#64748b', maxWidth: '600px', margin: '15px auto 0', fontSize: '1.05rem', lineHeight: 1.6 }}>Explore our range of highly effective pest control services for your home and business.</motion.p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '30px', maxWidth: '1200px', margin: '0 auto' }}>
+          {currentServices.map((service, idx) => (
+            <motion.div 
+              key={idx} 
+              initial={{ opacity: 0, y: 30 }} 
+              whileInView={{ opacity: 1, y: 0 }} 
+              viewport={{ once: true }} 
+              transition={{ delay: (idx % servicesPerPage) * 0.1 }}
+              onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}
+              className="service-card-modern"
+            >
+              <div className="service-card-img-container">
+                <img 
+                  src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}?t=${service.updated_at ? new Date(service.updated_at).getTime() : Date.now()}` : (service.service_image || '/logo.png')}
+                  alt={service.service_name}
+                  className="service-card-img"
+                  onError={(e) => { e.target.onerror = null; e.target.src = '/logo.png'; }}
+                />
+                <div className="service-price-tag">
+                  ₹{service.base_price}
+                </div>
+              </div>
+              <div className="service-card-content">
+                <h3 className="service-card-title">{service.service_name}</h3>
+                <p className="service-card-desc">
+                  {service.description || 'Professional pest control treatment providing complete eradication and long-term protection for your property.'}
+                </p>
+                <div className="service-card-footer">
+                  <span style={{ color: 'var(--secondary, #2A329F)', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.95rem' }}>
+                    View Details <ArrowRight size={18} />
+                  </span>
+                  <div style={{ display: 'flex', gap: '4px', color: '#fbbf24' }}>
+                    <Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+        
+        {totalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '50px', flexWrap: 'wrap' }}>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+              <button
+                key={number}
+                onClick={() => handlePageChange(number)}
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  border: 'none',
+                  backgroundColor: currentPage === number ? 'var(--secondary, #2A329F)' : '#e2e8f0',
+                  color: currentPage === number ? 'white' : '#475569',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: currentPage === number ? '0 4px 6px rgba(42, 50, 159, 0.3)' : 'none'
+                }}
+                onMouseOver={(e) => { if(currentPage !== number) e.currentTarget.style.backgroundColor = '#cbd5e1'; }}
+                onMouseOut={(e) => { if(currentPage !== number) e.currentTarget.style.backgroundColor = '#e2e8f0'; }}
+              >
+                {number}
+              </button>
+            ))}
+            
+            <button
+              onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              style={{
+                padding: '0 15px',
+                height: '40px',
+                borderRadius: '20px',
+                border: 'none',
+                backgroundColor: currentPage === totalPages ? '#e2e8f0' : 'var(--secondary, #2A329F)',
+                color: currentPage === totalPages ? '#94a3b8' : 'white',
+                fontWeight: 'bold',
+                cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                opacity: currentPage === totalPages ? 0.6 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              Next <ArrowRight size={16} />
+            </button>
+          </div>
+        )}
+      </section>
 
       {/* Legacy Content Integrated Below E-commerce layout */}
       <div className="legacy-content-wrapper" style={{ backgroundColor: '#fff' }}>
@@ -235,7 +347,7 @@ const Home = () => {
               </motion.div>
             </motion.div>
             <motion.div className="intro-image" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeInRight}>
-              <motion.img whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }} src="/WhatsApp-Image-2026-05-21-at-4.46.12-PM.jpeg" alt="Diamond Pest Control professional" className="featured-image rounded-2xl shadow-2xl" />
+              <motion.img whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }} src="/image.png" alt="Diamond Pest Control professional" className="featured-image rounded-2xl shadow-2xl" />
             </motion.div>
           </div>
         </section>
@@ -244,9 +356,7 @@ const Home = () => {
         <section className="who-we-are bg-light section-padding">
           <div className="container intro-grid">
             <motion.div className="intro-image" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeInLeft}>
-              <motion.div whileHover={{ rotate: 5, scale: 1.05 }} className="image-placeholder secondary-bg shadow-xl">
-                <ThumbsUp size={100} className="placeholder-icon" />
-              </motion.div>
+              <motion.img whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }} src="/Services/termite-service.png" alt="Termite Service" className="featured-image rounded-2xl shadow-2xl" />
             </motion.div>
             <motion.div className="intro-text" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
               <motion.h4 variants={fadeInRight} className="section-subtitle">WHO WE ARE</motion.h4>
@@ -271,9 +381,9 @@ const Home = () => {
             <motion.h4 variants={fadeInUp} className="section-subtitle white">OUR ACHIEVEMENT</motion.h4>
             <motion.h2 variants={fadeInUp}>Celebrating Excellence in Pest Control</motion.h2>
             <motion.div variants={staggerContainer} className="achievement-stats">
-              <motion.div variants={fadeInUp} className="stat-box"><h3>5000+</h3><p>Happy Clients</p></motion.div>
-              <motion.div variants={fadeInUp} className="stat-box"><h3>15+</h3><p>Years Experience</p></motion.div>
-              <motion.div variants={fadeInUp} className="stat-box"><h3>100%</h3><p>Safe Chemicals</p></motion.div>
+              <motion.div variants={fadeInUp} className="stat-box"><h3><AnimatedCounter end={40} suffix="k+" /></h3><p>Happy Clients</p></motion.div>
+              <motion.div variants={fadeInUp} className="stat-box"><h3><AnimatedCounter end={40} suffix="+" /></h3><p>Years Experience</p></motion.div>
+              <motion.div variants={fadeInUp} className="stat-box"><h3><AnimatedCounter end={100} suffix="%" /></h3><p>Safe Chemicals</p></motion.div>
             </motion.div>
           </div>
         </motion.section>
@@ -362,10 +472,6 @@ const Home = () => {
                   </motion.div>
                 </motion.div>
               ))}
-              <motion.div variants={fadeInRight} className="faq-footer-help mt-8 p-6 bg-white rounded-xl shadow-md text-center">
-                <h4>Still have questions?</h4>
-                <Link to="/contact" className="btn btn-secondary mt-4 inline-block">Contact Us</Link>
-              </motion.div>
             </motion.div>
           </div>
         </section>

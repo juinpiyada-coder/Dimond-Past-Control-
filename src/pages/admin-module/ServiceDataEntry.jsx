@@ -290,7 +290,16 @@ const ServiceDataEntry = ({ entityId, onClose }) => {
                 </div>
                 {formData.service_image && (
                   <div style={{ width: '80px', height: '80px', borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
-                    <img src={formData.service_image} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img 
+                      src={
+                        formData.service_image.startsWith('/api/') 
+                          ? (import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api', '') : 'http://localhost:8000') + formData.service_image 
+                          : formData.service_image
+                      } 
+                      alt="Preview" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                      onError={(e) => { e.target.onerror = null; e.target.src = '/logo1.png'; }}
+                    />
                   </div>
                 )}
               </div>

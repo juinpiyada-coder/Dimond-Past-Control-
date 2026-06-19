@@ -402,8 +402,8 @@ const Dashboard = () => {
       {error && users.length === 0 ? (
         <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '1rem 1.5rem', borderRadius: '0.75rem' }}>{error}</div>
       ) : (
-        <div style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <div className="admin-table-wrapper" style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
             <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
               <tr>
                 <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Name</th>
@@ -469,8 +469,8 @@ const Dashboard = () => {
       {error && employees.length === 0 ? (
         <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '1rem 1.5rem', borderRadius: '0.75rem' }}>{error}</div>
       ) : (
-        <div style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <div className="admin-table-wrapper" style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
             <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
               <tr>
                 <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Emp. Code</th>
@@ -525,8 +525,8 @@ const Dashboard = () => {
       {error && customers.length === 0 ? (
         <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '1rem 1.5rem', borderRadius: '0.75rem' }}>{error}</div>
       ) : (
-        <div style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <div className="admin-table-wrapper" style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
             <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
               <tr>
                 <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Client Name</th>
@@ -598,8 +598,8 @@ const Dashboard = () => {
       ) : error ? (
         <div style={{ textAlign: 'center', padding: '3rem', color: '#ef4444', backgroundColor: '#fef2f2', borderRadius: '0.75rem', border: '1px solid #fecaca' }}>{error}</div>
       ) : (
-        <div style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <div className="admin-table-wrapper" style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
             <thead>
               <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                 <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Role Name</th>
@@ -706,7 +706,7 @@ const Dashboard = () => {
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc', fontFamily: '"Inter", "Segoe UI", Roboto, sans-serif' }}>
       
       {/* Professional Sidebar */}
-      <div style={{ 
+      <div className="admin-sidebar-mobile" style={{ 
         width: isSidebarOpen ? '280px' : '0px', 
         backgroundColor: '#ffffff', 
         borderRight: isSidebarOpen ? '1px solid #e2e8f0' : 'none', 
@@ -859,9 +859,9 @@ const Dashboard = () => {
             ) : activeTab === 'blogs' ? (
               blogView === 'grid' ? renderBlogGrid() : <BlogDataEntry blogId={editingBlogId} onClose={closeEditor} />
             ) : activeTab === 'customers' ? (
-              customerView === 'grid' ? renderCustomerGrid() : 
-              customerView === 'editor' ? <CustomerDataEntry customerId={activeCustomerId} onClose={closeCustomerView} /> :
-              <CustomerDetails customerId={activeCustomerId} onClose={closeCustomerView} />
+              customerView === 'editor' ? <CustomerDataEntry customerId={activeCustomerId} onClose={closeCustomerEditor} /> :
+              customerView === 'details' ? <CustomerDetails customerId={activeCustomerId} onClose={closeCustomerEditor} /> :
+              renderCustomerGrid()
             ) : activeTab === 'users' ? (
               userView === 'grid' ? renderUserGrid() : <UserDataEntry userId={editingUserId} onClose={closeUserEditor} />
             ) : activeTab === 'employees' ? (
@@ -900,3 +900,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+

@@ -118,10 +118,10 @@ const SettingsModule = () => {
   }
 
   return (
-    <div style={{ backgroundColor: 'white', borderRadius: '1.25rem', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', display: 'flex', minHeight: '600px' }}>
+    <div className="admin-settings-container">
       
       {/* Settings Sidebar */}
-      <div style={{ width: '250px', backgroundColor: '#f8fafc', borderRight: '1px solid #e2e8f0', padding: '2rem 1rem' }}>
+      <div className="admin-settings-sidebar">
         <h3 style={{ margin: '0 0 1.5rem 1rem', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Settings Menu</h3>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
@@ -156,7 +156,7 @@ const SettingsModule = () => {
       </div>
 
       {/* Settings Content */}
-      <div style={{ flex: 1, padding: '3rem', overflowY: 'auto' }}>
+      <div className="admin-settings-content">
         <form onSubmit={handleSave}>
           
           {activeTab === 'general' && (

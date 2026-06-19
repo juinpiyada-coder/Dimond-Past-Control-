@@ -78,19 +78,7 @@ const UserDashboard = () => {
         </button>
 
         {/* Sidebar */}
-        <div style={{ 
-          width: '280px', 
-          backgroundColor: 'white', 
-          borderRight: '1px solid #e2e8f0', 
-          display: 'flex', 
-          flexDirection: 'column',
-          position: window.innerWidth < 768 ? 'fixed' : 'relative',
-          transform: window.innerWidth < 768 && !isSidebarOpen ? 'translateX(-100%)' : 'translateX(0)',
-          transition: 'transform 0.3s ease',
-          zIndex: 50,
-          height: 'calc(100vh - 80px)', // adjust based on header height
-          top: 0
-        }}>
+        <div className={`dashboard-sidebar ${isSidebarOpen ? 'open' : ''}`}>
           <div style={{ padding: '2rem 1.5rem', borderBottom: '1px solid #f1f5f9' }}>
             <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', fontWeight: 700 }}>My Account</h2>
             <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.875rem' }}>{user.full_name}</p>
@@ -139,7 +127,7 @@ const UserDashboard = () => {
         </div>
 
         {/* Main Content Area */}
-        <div style={{ flex: 1, padding: '2rem', overflowY: 'auto', backgroundColor: '#f8fafc' }}>
+        <div className="dashboard-main-content" style={{ flex: 1, padding: '2rem', overflowY: 'auto', backgroundColor: '#f8fafc', width: '100%', overflowX: 'hidden' }}>
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             {renderContent()}
           </div>

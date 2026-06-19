@@ -5,14 +5,16 @@ const Rodents = () => {
   return (
     <ServiceLayout
       serviceName="Rodents"
-      title="Professional Rodent Management"
-      description="Rats and mice cause extensive property damage and spread dangerous diseases. We implement a strategic trapping and baiting system to safely remove rodents and secure your property against future entry."
-      image="/rodent_control.png"
+      title="Professional Rodent Control Service"
+      description="Rodents such as rats and mice can cause serious damage to property, contaminate food, spread diseases, and create unsafe living and working environments. Diamond Pest Control provides effective rodent management solutions designed to eliminate infestations and prevent future rodent activity."
+      image="/Services/rat-service.png"
       features={[
-        "Strategic placement of secure bait stations",
-        "Use of industry-approved glue boards and traps",
-        "Identification and sealing of entry points",
-        "Safe for environments with pets and children"
+        "Comprehensive Property Inspection",
+        "Identification of Rodent Entry Points",
+        "Rodent Nest Detection",
+        "Safe Baiting and Trapping Programs",
+        "Rodent-Proofing Recommendations",
+        "Ongoing Monitoring and Prevention"
       ]}
     />
   );
