@@ -11,6 +11,23 @@ const ServiceDetails = () => {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const getServiceImage = (name, defaultImg) => {
+    const n = (name || '').toLowerCase();
+    if (n.includes('cockroach')) return '/Services/cockroach-service.png';
+    if (n.includes('termite')) return '/Services/termite-service.png';
+    if (n.includes('bed bug')) return '/Services/bed-bug-service.png';
+    if (n.includes('rodent') || n.includes('rat')) return '/Services/rat-service.png';
+    if (n.includes('mosquito')) return '/Services/mosquito-service.png';
+    if (n.includes('ant')) return '/Services/ant-service.png';
+    if (n.includes('bird')) return '/Services/bird-control-servie.png';
+    if (n.includes('fly') || n.includes('flies')) return '/Services/fly-control-services.png';
+    if (n.includes('lizard')) return '/Services/lizard-service.png';
+    if (n.includes('commercial')) return '/Services/commercial-service.png';
+    if (n.includes('home') || n.includes('residential')) return '/Services/home-service.png';
+    if (n.includes('herbal')) return '/Services/herbal-service.png';
+    return defaultImg || '/Services/general-service.png';
+  };
+
   useEffect(() => {
     const cachedServices = localStorage.getItem('services');
     const cacheTime = localStorage.getItem('services_time');
@@ -159,18 +176,11 @@ const ServiceDetails = () => {
             transition={{ duration: 0.5 }}
             className="service-details-image"
           >
-            {service.service_image ? (
-              <img 
-                src={service.service_image} 
-                alt={service.service_name} 
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              <div style={{ textAlign: 'center', color: '#94a3b8' }}>
-                <Bug size={80} style={{ opacity: 0.3, marginBottom: '20px' }} />
-                <h3>No Image Available</h3>
-              </div>
-            )}
+            <img 
+              src={getServiceImage(service.service_name, service.service_image)} 
+              alt={service.service_name} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
           </motion.div>
 
           {/* Details Column */}

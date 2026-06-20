@@ -7,6 +7,7 @@ import { FaBug, FaBugs, FaMosquito, FaLocust } from 'react-icons/fa6';
 import { FaBed } from 'react-icons/fa';
 import { useQuery } from '@tanstack/react-query';
 import { apiCall } from '../utils/api';
+import CookieConsent from '../components/CookieConsent';
 
 import slider1 from '../assets/slider/slider-1.png';
 import slider2 from '../assets/slider/slider-2.png';
@@ -382,7 +383,7 @@ const Home = () => {
             <motion.h2 variants={fadeInUp}>Celebrating Excellence in Pest Control</motion.h2>
             <motion.div variants={staggerContainer} className="achievement-stats">
               <motion.div variants={fadeInUp} className="stat-box"><h3><AnimatedCounter end={40} suffix="k+" /></h3><p>Happy Clients</p></motion.div>
-              <motion.div variants={fadeInUp} className="stat-box"><h3><AnimatedCounter end={40} suffix="+" /></h3><p>Years Experience</p></motion.div>
+              <motion.div variants={fadeInUp} className="stat-box"><h3><AnimatedCounter end={30} suffix="+" /></h3><p>Years Experience</p></motion.div>
               <motion.div variants={fadeInUp} className="stat-box"><h3><AnimatedCounter end={100} suffix="%" /></h3><p>Safe Chemicals</p></motion.div>
             </motion.div>
           </div>
@@ -477,7 +478,7 @@ const Home = () => {
         </section>
       </div>
 
-
+      <CookieConsent />
     </div>
   );
 };

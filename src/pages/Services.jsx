@@ -8,14 +8,31 @@ const Services = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const getServiceImage = (name, defaultImg) => {
+    const n = (name || '').toLowerCase();
+    if (n.includes('cockroach')) return '/Services/cockroach-service.png';
+    if (n.includes('termite')) return '/Services/termite-service.png';
+    if (n.includes('bed bug')) return '/Services/bed-bug-service.png';
+    if (n.includes('rodent') || n.includes('rat')) return '/Services/rat-service.png';
+    if (n.includes('mosquito')) return '/Services/mosquito-service.png';
+    if (n.includes('ant')) return '/Services/ant-service.png';
+    if (n.includes('bird')) return '/Services/bird-control-servie.png';
+    if (n.includes('fly') || n.includes('flies')) return '/Services/fly-control-services.png';
+    if (n.includes('lizard')) return '/Services/lizard-service.png';
+    if (n.includes('commercial')) return '/Services/commercial-service.png';
+    if (n.includes('home') || n.includes('residential')) return '/Services/home-service.png';
+    if (n.includes('herbal')) return '/Services/herbal-service.png';
+    return defaultImg || '/Services/general-service.png';
+  };
+
   const staticServices = [
-    { name: "Cockroaches", path: "/service/cockroaches", img: "/cockroach_control.png", desc: "Complete eradication of cockroaches with targeted gel baiting and odorless sprays." },
-    { name: "Termites", path: "/service/termites", img: "/termite_control.png", desc: "Advanced drill-fill-seal anti-termite treatments for pre and post-construction." },
-    { name: "Bed Bugs", path: "/service/bed-bugs", img: "/bed_bug_control.png", desc: "Intensive multi-step treatment to eliminate bed bugs from all hiding places." },
-    { name: "Rodents", path: "/service/rodents", img: "/rodent_control.png", desc: "Professional trapping and baiting to manage rats and mice securely." },
-    { name: "Mosquitoes", path: "/service/mosquitoes", img: "/mosquito_control.png", desc: "Comprehensive indoor and outdoor thermal fogging for mosquito control." },
-    { name: "Ants", path: "/service/ants", img: "/ant_control.png", desc: "Targeted ant bait application to destroy colonies at their source." },
-    { name: "Wood Borer", path: "/service/wood-borer", img: "/wood_borer_control.png", desc: "Specialized chemical injection to preserve furniture from wood borers." }
+    { name: "Cockroaches", path: "/service/cockroaches", img: getServiceImage("Cockroaches"), desc: "Complete eradication of cockroaches with targeted gel baiting and odorless sprays." },
+    { name: "Termites", path: "/service/termites", img: getServiceImage("Termites"), desc: "Advanced drill-fill-seal anti-termite treatments for pre and post-construction." },
+    { name: "Bed Bugs", path: "/service/bed-bugs", img: getServiceImage("Bed Bugs"), desc: "Intensive multi-step treatment to eliminate bed bugs from all hiding places." },
+    { name: "Rodents", path: "/service/rodents", img: getServiceImage("Rodents"), desc: "Professional trapping and baiting to manage rats and mice securely." },
+    { name: "Mosquitoes", path: "/service/mosquitoes", img: getServiceImage("Mosquitoes"), desc: "Comprehensive indoor and outdoor thermal fogging for mosquito control." },
+    { name: "Ants", path: "/service/ants", img: getServiceImage("Ants"), desc: "Targeted ant bait application to destroy colonies at their source." },
+    { name: "Wood Borer", path: "/service/wood-borer", img: getServiceImage("Wood Borer"), desc: "Specialized chemical injection to preserve furniture from wood borers." }
   ];
 
   useEffect(() => {
@@ -198,18 +215,11 @@ const Services = () => {
                     style={{ backgroundColor: 'var(--bg-white)', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)', display: 'flex', flexDirection: 'column' }}
                   >
                     <div style={{ height: '200px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                      {service.service_image ? (
-                        <img
-                          src={service.service_image}
-                          alt={service.service_name}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                      ) : (
-                        <div style={{ textAlign: 'center', color: '#94a3b8' }}>
-                          <Bug size={48} style={{ opacity: 0.5, marginBottom: '10px' }} />
-                          <span style={{ display: 'block', fontSize: '0.9rem' }}>Image coming soon</span>
-                        </div>
-                      )}
+                      <img
+                        src={getServiceImage(service.service_name, service.service_image)}
+                        alt={service.service_name}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
                     </div>
 
                     <div style={{ padding: '30px 25px', display: 'flex', flexDirection: 'column', flexGrow: 1, backgroundColor: 'var(--primary)', textAlign: 'center', alignItems: 'center' }}>

@@ -139,7 +139,7 @@ const Header = () => {
         </Link>
 
         {/* Search Bar */}
-        <div style={{ position: 'relative', flex: 1, maxWidth: '600px', margin: '0 20px' }}>
+        <div className="ecom-search-wrapper">
           <form className="ecom-search-bar" onSubmit={handleSearch} style={{ margin: 0, width: '100%' }}>
             <input 
               type="text" 
