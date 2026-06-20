@@ -25,6 +25,7 @@ const ServiceDetails = () => {
     if (n.includes('commercial')) return '/Services/commercial-service.png';
     if (n.includes('home') || n.includes('residential')) return '/Services/home-service.png';
     if (n.includes('herbal')) return '/Services/herbal-service.png';
+    if (n.includes('general')) return '/Services/general-service.png';
     return defaultImg || '/Services/general-service.png';
   };
 
