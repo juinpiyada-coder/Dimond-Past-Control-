@@ -97,6 +97,18 @@ const Header = () => {
     <>
     {isNavigating && <FifaLoader />}
     <header className="ecom-header" style={{ position: 'relative' }}>
+      {/* Football Animation Container */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
+        <motion.div
+          style={{ position: 'absolute', top: '50%', marginTop: '-12px', fontSize: '24px' }}
+          initial={{ left: '0%', rotate: 0 }}
+          animate={{ left: '100%', rotate: 720 }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+        >
+          ⚽
+        </motion.div>
+      </div>
+      
       {/* Top Bar (Nav Belt) */}
       <div className="ecom-nav-belt">
         {/* Mobile Hamburger */}
@@ -106,24 +118,15 @@ const Header = () => {
 
         {/* Logo */}
         <Link to="/" className="ecom-logo-link" style={{ position: 'relative', display: 'flex', alignItems: 'center' }} onClick={(e) => handleNavigation(e, '/')}>
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <motion.img 
-              src="/logo1.png" 
-              alt="Diamond Pest Control Logo" 
-              className="ecom-logo-img" 
-              style={{ position: 'relative', zIndex: 10 }} 
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-            />
-            <motion.div
-              style={{ position: 'absolute', top: '50%', left: '50%', marginTop: '-12px', marginLeft: '-12px', fontSize: '24px', zIndex: 11, pointerEvents: 'none' }}
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-            >
-              ⚽
-            </motion.div>
-          </div>
+          <motion.img 
+            src="/logo1.png" 
+            alt="Diamond Pest Control Logo" 
+            className="ecom-logo-img" 
+            style={{ position: 'relative', zIndex: 10 }} 
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          />
           <motion.span 
             className="desktop-only" 
             style={{ fontSize: '1.3rem', fontWeight: 'bold', marginLeft: '10px', position: 'relative', zIndex: 10, display: 'inline-block' }}
