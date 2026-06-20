@@ -151,11 +151,6 @@ const Services = () => {
       <section className="section-padding">
         <div className="container">
           <h2 className="section-title">Our Services</h2>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <Link to="/all-services" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '12px 24px', fontSize: '1.1rem' }}>
-              View Comprehensive Services Catalog <ArrowRight size={20} />
-            </Link>
-          </div>
 
           <motion.div
             className="services-grid"

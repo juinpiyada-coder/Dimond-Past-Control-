@@ -97,20 +97,25 @@ const Header = () => {
     <>
     {isNavigating && <FifaLoader />}
     <header className="ecom-header" style={{ position: 'relative' }}>
-      {/* Football Animation Container */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
-        <motion.div
-          style={{ position: 'absolute', top: '50%', marginTop: '-12px', fontSize: '24px' }}
-          initial={{ left: '0%', rotate: 0 }}
-          animate={{ left: '100%', rotate: 720 }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-        >
-          ⚽
-        </motion.div>
-      </div>
-      
       {/* Top Bar (Nav Belt) */}
-      <div className="ecom-nav-belt">
+      <div className="ecom-nav-belt" style={{ position: 'relative' }}>
+        {/* Football Animation Container */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', pointerEvents: 'none', zIndex: 10, display: 'flex', alignItems: 'center' }}>
+          <motion.div
+            style={{ position: 'absolute', fontSize: '24px', display: 'flex', alignItems: 'center' }}
+            initial={{ left: '-50px' }}
+            animate={{ left: '100%' }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+          >
+            <motion.div
+              animate={{ rotate: 720 }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+            >
+              ⚽
+            </motion.div>
+          </motion.div>
+        </div>
+        
         {/* Mobile Hamburger */}
         <div className="mobile-only" style={{ cursor: 'pointer', marginRight: '10px' }} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
           <Menu size={28} />

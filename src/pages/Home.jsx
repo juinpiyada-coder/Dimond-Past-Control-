@@ -348,7 +348,7 @@ const Home = () => {
               </motion.div>
             </motion.div>
             <motion.div className="intro-image" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeInRight}>
-              <motion.img whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }} src="/image.png" alt="Diamond Pest Control professional" className="featured-image rounded-2xl shadow-2xl" />
+              <motion.img whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }} src="/hero-img/hero-1.png" alt="Diamond Pest Control professional" className="featured-image rounded-2xl shadow-2xl" />
             </motion.div>
           </div>
         </section>
@@ -357,7 +357,7 @@ const Home = () => {
         <section className="who-we-are bg-light section-padding">
           <div className="container intro-grid">
             <motion.div className="intro-image" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeInLeft}>
-              <motion.img whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }} src="/Services/termite-service.png" alt="Termite Service" className="featured-image rounded-2xl shadow-2xl" />
+              <motion.img whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }} src="/hero-img/hero-2.png" alt="Pest Control Service" className="featured-image rounded-2xl shadow-2xl" />
             </motion.div>
             <motion.div className="intro-text" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
               <motion.h4 variants={fadeInRight} className="section-subtitle">WHO WE ARE</motion.h4>

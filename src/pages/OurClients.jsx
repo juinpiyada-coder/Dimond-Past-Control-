@@ -9,7 +9,6 @@ const OurClients = () => {
     { name: "Bank of India", image: "/Clients/bank of india.webp" },
     { name: "Bank of Maharashtra", image: "/Clients/bank of maharasta.webp" },
     { name: "Coal India", image: "/Clients/coal india.webp" },
-    { name: "FSSAI", image: "/Clients/fssai.png" },
     { name: "Indian Railway", image: "/Clients/indianrailway.webp" },
     { name: "PNB Bank", image: "/Clients/pnb bank.webp" },
     { name: "SBI Bank", image: "/Clients/sbi bank .webp" }
