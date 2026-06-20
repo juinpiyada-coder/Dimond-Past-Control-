@@ -33,7 +33,9 @@ const Services = () => {
     { name: "Rodents", path: "/service/rodents", img: getServiceImage("Rodents"), desc: "Professional trapping and baiting to manage rats and mice securely." },
     { name: "Mosquitoes", path: "/service/mosquitoes", img: getServiceImage("Mosquitoes"), desc: "Comprehensive indoor and outdoor thermal fogging for mosquito control." },
     { name: "Ants", path: "/service/ants", img: getServiceImage("Ants"), desc: "Targeted ant bait application to destroy colonies at their source." },
-    { name: "Wood Borer", path: "/service/wood-borer", img: getServiceImage("Wood Borer"), desc: "Specialized chemical injection to preserve furniture from wood borers." }
+    { name: "Wood Borer", path: "/service/wood-borer", img: getServiceImage("Wood Borer"), desc: "Specialized chemical injection to preserve furniture from wood borers." },
+    { name: "Herbal Pest Control", path: "/service/herbal-pest-control", img: getServiceImage("Herbal Pest Control"), desc: "Safe, natural, and highly effective herbal treatments for a chemical-free pest solution." },
+    { name: "Lizard Control", path: "/service/lizard-control", img: getServiceImage("Lizard"), desc: "Specialized and safe treatments to keep your premises free from lizards." }
   ];
 
   useEffect(() => {
@@ -167,7 +169,7 @@ const Services = () => {
                 whileHover={{ y: -8 }}
                 style={{ backgroundColor: 'var(--bg-white)', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)', display: 'flex', flexDirection: 'column' }}
               >
-                <div style={{ height: '200px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <div style={{ aspectRatio: '1 / 1', width: '100%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                   <img
                     src={service.img}
                     alt={service.name}
@@ -210,7 +212,7 @@ const Services = () => {
                     whileHover={{ y: -8 }}
                     style={{ backgroundColor: 'var(--bg-white)', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)', display: 'flex', flexDirection: 'column' }}
                   >
-                    <div style={{ height: '200px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                    <div style={{ aspectRatio: '1 / 1', width: '100%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                       <img
                         src={getServiceImage(service.service_name, service.service_image)}
                         alt={service.service_name}

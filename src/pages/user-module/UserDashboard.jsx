@@ -66,47 +66,38 @@ const UserDashboard = () => {
 
   return (
     <>
-      <div style={{ display: 'flex', minHeight: 'calc(100vh - 80px)', backgroundColor: '#f8fafc' }}>
+      <div className="flex flex-col md:flex-row min-h-[calc(100vh-80px)] bg-slate-50 relative">
         
         {/* Mobile Sidebar Toggle */}
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 100, backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '50%', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px rgba(37,99,235,0.3)', cursor: 'pointer' }}
-          className="hide-desktop"
+          className="md:hidden fixed bottom-6 right-6 z-50 bg-blue-600 text-white border-none rounded-full w-14 h-14 flex items-center justify-center shadow-lg cursor-pointer"
         >
           {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
         {/* Sidebar */}
-        <div className={`dashboard-sidebar ${isSidebarOpen ? 'open' : ''}`}>
-          <div style={{ padding: '2rem 1.5rem', borderBottom: '1px solid #f1f5f9' }}>
-            <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', fontWeight: 700 }}>My Account</h2>
-            <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.875rem' }}>{user.full_name}</p>
+        <div className={`dashboard-sidebar ${isSidebarOpen ? 'open' : ''} bg-white shadow-md md:shadow-none w-[280px] shrink-0 flex flex-col md:border-r border-slate-100 z-40 transition-transform duration-300 ${isSidebarOpen ? 'fixed inset-y-0 left-0 translate-x-0' : 'fixed inset-y-0 -translate-x-full md:static md:translate-x-0'}`}>
+          <div className="p-6 md:p-8 border-b border-slate-100 flex justify-between items-center">
+            <div>
+              <h2 className="m-0 text-xl text-slate-900 font-bold">My Account</h2>
+              <p className="m-1 mt-0 text-slate-500 text-sm">{user.full_name}</p>
+            </div>
+            {isSidebarOpen && (
+              <button onClick={() => setIsSidebarOpen(false)} className="md:hidden p-2 text-slate-500 hover:text-slate-800 border-none bg-transparent">
+                <X size={20} />
+              </button>
+            )}
           </div>
 
-          <div style={{ padding: '1rem', flex: 1, overflowY: 'auto' }}>
+          <div className="p-4 flex-1 overflow-y-auto space-y-2">
             {navItems.map(item => {
               const isActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    width: '100%',
-                    padding: '1rem',
-                    marginBottom: '0.5rem',
-                    backgroundColor: isActive ? '#eff6ff' : 'transparent',
-                    color: isActive ? '#2563eb' : '#475569',
-                    border: 'none',
-                    borderRadius: '0.5rem',
-                    cursor: 'pointer',
-                    fontWeight: isActive ? 600 : 500,
-                    transition: 'all 0.2s ease',
-                    textAlign: 'left'
-                  }}
+                  className={`flex items-center gap-3 w-full p-4 rounded-lg cursor-pointer transition-all duration-200 text-left border-none ${isActive ? 'bg-blue-50 text-blue-600 font-semibold' : 'bg-transparent text-slate-600 font-medium hover:bg-slate-50'}`}
                 >
                   {item.icon}
                   {item.label}
@@ -115,10 +106,10 @@ const UserDashboard = () => {
             })}
           </div>
 
-          <div style={{ padding: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
+          <div className="p-6 border-t border-slate-100">
             <button
               onClick={handleLogout}
-              style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%', padding: '0.75rem', backgroundColor: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontWeight: 500 }}
+              className="flex items-center gap-3 w-full p-3 bg-transparent text-red-500 border-none cursor-pointer font-medium hover:bg-red-50 rounded-lg transition-colors"
             >
               <LogOut size={20} />
               Sign Out
@@ -126,9 +117,17 @@ const UserDashboard = () => {
           </div>
         </div>
 
+        {/* Mobile Sidebar Overlay */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-slate-900/50 z-30 md:hidden backdrop-blur-sm transition-opacity"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
         {/* Main Content Area */}
-        <div className="dashboard-main-content" style={{ flex: 1, padding: '2rem', overflowY: 'auto', backgroundColor: '#f8fafc', width: '100%', overflowX: 'hidden' }}>
-          <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <div className="flex-1 p-4 md:p-8 overflow-y-auto bg-slate-50 w-full overflow-x-hidden">
+          <div className="max-w-5xl mx-auto">
             {renderContent()}
           </div>
         </div>
