@@ -651,7 +651,6 @@ const Dashboard = () => {
       items: [
         { id: 'bookings', label: 'Bookings', icon: <FiCalendar size={20} /> },
         { id: 'employee_assignments', label: 'Assignments', icon: <FiBriefcase size={20} /> },
-        { id: 'service_images', label: 'Service Images', icon: <FiImage size={20} /> },
         { id: 'invoices', label: 'Invoices', icon: <FiFile size={20} /> },
       ]
     },

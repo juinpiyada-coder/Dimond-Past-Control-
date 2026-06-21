@@ -8,7 +8,6 @@ const ModuleLauncher = ({ setActiveTab, preferences, setPreferences }) => {
     { id: 'dashboard', label: 'Dashboard', icon: <FiGrid size={24} />, color: '#3b82f6', bg: '#eff6ff' },
     { id: 'bookings', label: 'Bookings', icon: <FiCalendar size={24} />, color: '#8b5cf6', bg: '#f5f3ff' },
     { id: 'employee_assignments', label: 'Assignments', icon: <FiBriefcase size={24} />, color: '#10b981', bg: '#ecfdf5' },
-    { id: 'service_images', label: 'Service Images', icon: <FiImage size={24} />, color: '#f59e0b', bg: '#fffbeb' },
     { id: 'invoices', label: 'Invoices', icon: <FiFile size={24} />, color: '#6366f1', bg: '#e0e7ff' },
     { id: 'customers', label: 'Customers', icon: <FiUsers size={24} />, color: '#ec4899', bg: '#fdf2f8' },
     { id: 'users', label: 'System Users', icon: <FiSettings size={24} />, color: '#64748b', bg: '#f8fafc' },

@@ -3,7 +3,6 @@ import { FiPlus, FiEdit2, FiTrash2, FiFileText } from 'react-icons/fi';
 import { apiCall } from '../../utils/api';
 
 import ServiceDataEntry from './ServiceDataEntry';
-import ServiceImageDataEntry from './ServiceImageDataEntry';
 import ReviewDataEntry from './ReviewDataEntry';
 import ReferralDataEntry from './ReferralDataEntry';
 import PestTypeDataEntry from './PestTypeDataEntry';
@@ -14,7 +13,6 @@ import BookingOverview from './BookingOverview';
 
 const MODULE_CONFIG = {
   services: { name: 'Services', endpoint: 'services', idField: 'service_id', columns: ['service_image', 'service_name', 'base_price', 'status'], Editor: ServiceDataEntry },
-  service_images: { name: 'Service Images', endpoint: 'service-images', idField: 'service_image_id', columns: ['image_data', 'booking_id', 'employee_id', 'image_category'], Editor: ServiceImageDataEntry },
   reviews: { name: 'Reviews', endpoint: 'reviews', idField: 'review_id', columns: ['review_image', 'customer_id', 'rating', 'created_at'], Editor: ReviewDataEntry },
   referrals: { name: 'Referrals', endpoint: 'referrals', idField: 'referral_id', columns: ['referral_code', 'reward_points', 'status'], Editor: ReferralDataEntry },
   pest_types: { name: 'Pest Types', endpoint: 'pest-types', idField: 'pest_id', columns: ['icon_image', 'pest_name', 'description'], Editor: PestTypeDataEntry },
