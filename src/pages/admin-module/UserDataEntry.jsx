@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiCall } from '../../utils/api';
-import { FiSave, FiX, FiUser, FiMail, FiPhone, FiLock, FiShield, FiActivity } from 'react-icons/fi';
+import { FiSave, FiX, FiUser, FiMail, FiPhone, FiLock, FiShield, FiActivity, FiImage } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
 const UserDataEntry = ({ userId, onClose }) => {
@@ -10,7 +10,8 @@ const UserDataEntry = ({ userId, onClose }) => {
     phone: '',
     password_hash: '',
     role_id: '2', // Default to Customer
-    status: 'ACTIVE'
+    status: 'ACTIVE',
+    profile_image: ''
   });
 
   const [loading, setLoading] = useState(false);
@@ -31,8 +32,10 @@ const UserDataEntry = ({ userId, onClose }) => {
           email: data.email || '',
           phone: data.phone || '',
           password_hash: '', // Keep empty
+          password_hash: '', // Keep empty
           role_id: data.role_id?.toString() || '2',
-          status: data.status || 'ACTIVE'
+          status: data.status || 'ACTIVE',
+          profile_image: data.profile_image || ''
         });
       } else {
         toast.error('Failed to fetch user details');
@@ -47,6 +50,21 @@ const UserDataEntry = ({ userId, onClose }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, profile_image: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleClearImage = () => {
+    setFormData(prev => ({ ...prev, profile_image: '' }));
   };
 
   const handleSubmit = async (e) => {
@@ -183,6 +201,33 @@ const UserDataEntry = ({ userId, onClose }) => {
                   style={inputStyles}
                   required
                 />
+              </div>
+            </div>
+
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyles}>Profile Image</label>
+              <div style={{ position: 'relative', display: 'flex', gap: '1.5rem', alignItems: 'center', padding: '1.5rem', border: '2px dashed #cbd5e1', borderRadius: '0.75rem', backgroundColor: '#f8fafc', transition: 'border-color 0.2s' }}>
+                <div style={{ flex: 1 }}>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    id="profile_image_upload"
+                    style={{ display: 'none' }}
+                  />
+                  <label htmlFor="profile_image_upload" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', backgroundColor: '#e2e8f0', color: '#334155', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem', transition: 'background-color 0.2s' }}>
+                    <FiImage /> Choose Image
+                  </label>
+                  <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#64748b' }}>Max file size: 2MB. Format: JPG, PNG, WebP.</p>
+                </div>
+                {formData.profile_image && (
+                  <div style={{ position: 'relative', width: '100px', height: '100px', borderRadius: '0.5rem', overflow: 'hidden', border: '2px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                    <img src={formData.profile_image} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <button type="button" onClick={handleClearImage} style={{ position: 'absolute', top: '4px', right: '4px', backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                      <FiX size={14} />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 

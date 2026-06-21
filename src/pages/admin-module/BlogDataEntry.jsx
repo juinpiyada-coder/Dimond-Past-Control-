@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiCall } from '../../utils/api';
+import { FiImage, FiX } from 'react-icons/fi';
 
 const BlogDataEntry = ({ blogId, onClose }) => {
   const [loading, setLoading] = useState(false);
@@ -88,6 +89,10 @@ const BlogDataEntry = ({ blogId, onClose }) => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleClearImage = () => {
+    setFormData(prev => ({ ...prev, featured_image: '' }));
   };
 
   const handleSubmit = async (e) => {
@@ -217,28 +222,27 @@ const BlogDataEntry = ({ blogId, onClose }) => {
 
             <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #e5e7eb' }}>
               <h3 style={{ margin: '0 0 1rem 0', color: '#111827', fontSize: '1rem' }}>Featured Image</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#4b5563', cursor: 'pointer', padding: '0.5rem', border: '1px dashed #d1d5db', borderRadius: '0.375rem', textAlign: 'center', backgroundColor: '#f9fafb' }}>
-                  Upload Image
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ padding: '1.5rem', border: '2px dashed #cbd5e1', borderRadius: '0.75rem', backgroundColor: '#f8fafc', textAlign: 'center' }}>
                   <input 
                     type="file" 
                     accept="image/*"
                     onChange={handleImageUpload} 
+                    id="blog_image_upload"
                     style={{ display: 'none' }} 
                   />
-                </label>
-                <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#9ca3af', margin: '0.25rem 0' }}>OR</div>
-                <input 
-                  type="text" 
-                  name="featured_image" 
-                  value={formData.featured_image} 
-                  onChange={handleChange} 
-                  placeholder="Paste image URL here..." 
-                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.375rem', outline: 'none' }} 
-                />
+                  <label htmlFor="blog_image_upload" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', backgroundColor: '#e2e8f0', color: '#334155', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}>
+                    <FiImage /> Choose Image
+                  </label>
+                  <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#64748b' }}>Max file size: 2MB. Format: JPG, PNG, WebP.</p>
+                </div>
+                
                 {formData.featured_image && (
-                  <div style={{ marginTop: '0.5rem', borderRadius: '0.375rem', overflow: 'hidden', border: '1px solid #e5e7eb' }}>
-                    <img src={formData.featured_image} alt="Preview" style={{ width: '100%', display: 'block', maxHeight: '150px', objectFit: 'cover' }} />
+                  <div style={{ position: 'relative', width: '100%', borderRadius: '0.5rem', overflow: 'hidden', border: '2px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                    <img src={formData.featured_image} alt="Preview" style={{ width: '100%', display: 'block', maxHeight: '200px', objectFit: 'cover' }} />
+                    <button type="button" onClick={handleClearImage} style={{ position: 'absolute', top: '8px', right: '8px', backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                      <FiX size={16} />
+                    </button>
                   </div>
                 )}
               </div>

@@ -75,6 +75,10 @@ const ServiceDataEntry = ({ entityId, onClose }) => {
     }
   };
 
+  const handleClearImage = () => {
+    setFormData(prev => ({ ...prev, service_image: '' }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -278,28 +282,26 @@ const ServiceDataEntry = ({ entityId, onClose }) => {
 
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={labelStyles}>Service Banner Image</label>
-              <div style={{ position: 'relative', display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+              <div style={{ position: 'relative', display: 'flex', gap: '1.5rem', alignItems: 'center', padding: '1.5rem', border: '2px dashed #cbd5e1', borderRadius: '0.75rem', backgroundColor: '#f8fafc', transition: 'border-color 0.2s' }}>
                 <div style={{ flex: 1 }}>
                   <input 
                     type="file" 
                     accept="image/*"
                     onChange={handleImageChange}
-                    style={{ ...inputStyles, paddingLeft: '1rem', cursor: 'pointer' }}
+                    id="service_image_upload"
+                    style={{ display: 'none' }}
                   />
-                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>Max file size: 2MB. Format: JPG, PNG, WebP.</p>
+                  <label htmlFor="service_image_upload" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', backgroundColor: '#e2e8f0', color: '#334155', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem', transition: 'background-color 0.2s' }}>
+                    <FiImage /> Choose Image
+                  </label>
+                  <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#64748b' }}>Max file size: 2MB. Format: JPG, PNG, WebP.</p>
                 </div>
                 {formData.service_image && (
-                  <div style={{ width: '80px', height: '80px', borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
-                    <img 
-                      src={
-                        formData.service_image.startsWith('/api/') 
-                          ? (import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api', '') : 'http://localhost:8000') + formData.service_image 
-                          : formData.service_image
-                      } 
-                      alt="Preview" 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                      onError={(e) => { e.target.onerror = null; e.target.src = '/logo1.png'; }}
-                    />
+                  <div style={{ position: 'relative', width: '100px', height: '100px', borderRadius: '0.5rem', overflow: 'hidden', border: '2px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                    <img src={formData.service_image} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <button type="button" onClick={handleClearImage} style={{ position: 'absolute', top: '4px', right: '4px', backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                      <FiX size={14} />
+                    </button>
                   </div>
                 )}
               </div>
