@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home as HomeIcon, Video, Grid, User, ShoppingCart, MapPin, Search, Menu, X, ArrowRight, Bug, Activity, Shield, Clock, ThumbsUp, Star, ChevronDown, CheckCircle2, PhoneCall, Quote, Building, Bird } from 'lucide-react';
+import { Home as HomeIcon, Video, Grid, User, ShoppingCart, MapPin, Search, Menu, X, ArrowRight, Bug, Activity, Shield, Clock, ThumbsUp, Star, ChevronDown, ChevronLeft, ChevronRight, CheckCircle2, PhoneCall, Quote, Building, Bird, Leaf } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { GiRat, GiAnt } from 'react-icons/gi';
 import { FaBug, FaBugs, FaMosquito, FaLocust } from 'react-icons/fa6';
@@ -56,6 +56,37 @@ const AnimatedCounter = ({ end, suffix = '' }) => {
 const Home = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const ribbonRef = React.useRef(null);
+
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [hasDragged, setHasDragged] = useState(false);
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setHasDragged(false);
+    setStartX(e.pageX - ribbonRef.current.offsetLeft);
+    setScrollLeft(ribbonRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    setHasDragged(true);
+    const x = e.pageX - ribbonRef.current.offsetLeft;
+    const walk = (x - startX) * 2;
+    ribbonRef.current.scrollLeft = scrollLeft - walk;
+  };
 
   const sliderImages = [slider1, slider2, slider3, slider4, slider5];
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -94,6 +125,8 @@ const Home = () => {
     { name: "Commercial", path: "commercial", icon: <Building size={32} color="#2A329F" /> },
     { name: "General", path: "general", icon: <Shield size={32} color="#2A329F" /> },
     { name: "Home Service", path: "home-service", icon: <HomeIcon size={32} color="#2A329F" /> },
+    { name: "Lizard Control", path: "lizard-control", icon: <Bug size={32} color="#2A329F" /> },
+    { name: "Herbal Pest Control", path: "herbal-pest-control", icon: <Leaf size={32} color="#2A329F" /> },
   ];
 
 
@@ -127,10 +160,27 @@ const Home = () => {
   const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.2 } } };
 
   // Pagination calculations
+  const processedServices = services.map(s => {
+    const sName = s?.service_name?.toLowerCase() || '';
+    let newService = { ...s };
+    if (sName.includes('herbal')) {
+      newService.path = "herbal-pest-control";
+      newService.base_price = "0";
+    }
+    if (sName.includes('lizard')) {
+      newService.path = "lizard-control";
+    }
+    return newService;
+  });
+
+  const combinedServices = [
+    { service_name: "General Pest Control", description: "Comprehensive pest control coverage designed to keep your home safe from common household pests.", service_image: "Services/general-service.png", base_price: "0", path: "general" },
+    ...processedServices.filter(s => s?.service_name?.toLowerCase() !== 'general pest control')
+  ];
   const indexOfLastService = currentPage * servicesPerPage;
   const indexOfFirstService = indexOfLastService - servicesPerPage;
-  const currentServices = services.slice(indexOfFirstService, indexOfLastService);
-  const totalPages = Math.ceil(services.length / servicesPerPage);
+  const currentServices = combinedServices.slice(indexOfFirstService, indexOfLastService);
+  const totalPages = Math.ceil(combinedServices.length / servicesPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -184,28 +234,10 @@ const Home = () => {
 
 
 
-      {/* Category Ribbon */}
-      <div className="fk-category-ribbon">
-        <div className="fk-category-item" onClick={() => setIsSidebarOpen(true)}>
-          <div className="fk-category-icon-wrapper">
-            <Menu size={32} color="#2A329F" />
-          </div>
-          <span className="fk-category-text">All Pests</span>
-        </div>
-        {pestCategories.map((cat, idx) => (
-          <Link to={`/service/${cat.path}`} key={idx} className="fk-category-item" style={{ textDecoration: 'none' }}>
-            <div className="fk-category-icon-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {cat.icon}
-            </div>
-            <span className="fk-category-text">{cat.name}</span>
-          </Link>
-        ))}
-      </div>
-
       {/* Hero Slider */}
       <div className="hero-slider-container">
         {sliderImages.map((img, index) => (
-          <img 
+          <img
             key={index}
             src={img}
             alt={`Slide ${index + 1}`}
@@ -216,7 +248,7 @@ const Home = () => {
         {/* Slider Dots */}
         <div className="hero-slider-dots">
           {sliderImages.map((_, index) => (
-            <div 
+            <div
               key={index}
               onClick={() => setCurrentSlide(index)}
               className="slider-dot"
@@ -228,6 +260,78 @@ const Home = () => {
           ))}
         </div>
       </div>
+
+      {/* Category Ribbon */}
+      <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
+
+        <div 
+          ref={ribbonRef} 
+          className="fk-category-ribbon" 
+          style={{ overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none', display: 'flex', padding: '15px 40px', scrollBehavior: isDragging ? 'auto' : 'smooth', cursor: isDragging ? 'grabbing' : 'grab' }}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+        >
+          <style dangerouslySetInnerHTML={{__html: `.fk-category-ribbon::-webkit-scrollbar { display: none; }`}} />
+          <div className="fk-category-item" style={{ flexShrink: 0 }} onClick={(e) => { if (hasDragged) { e.preventDefault(); e.stopPropagation(); } else { setIsSidebarOpen(true); } }}>
+            <div className="fk-category-icon-wrapper">
+              <Menu size={32} color="#2A329F" />
+            </div>
+            <span className="fk-category-text">All Pests</span>
+          </div>
+          {pestCategories.map((cat, idx) => (
+            <Link 
+              to={`/service/${cat.path}`} 
+              key={idx} 
+              className="fk-category-item" 
+              style={{ textDecoration: 'none', flexShrink: 0 }}
+              draggable={false}
+              onClick={(e) => { if (hasDragged) { e.preventDefault(); e.stopPropagation(); } }}
+            >
+              <div className="fk-category-icon-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {cat.icon}
+              </div>
+              <span className="fk-category-text">{cat.name}</span>
+            </Link>
+          ))}
+        </div>
+
+      </div>
+
+      {/* Inspection Section */}
+      <section className="inspection-section" style={{ padding: '60px 20px', background: 'linear-gradient(135deg, var(--secondary, #2A329F) 0%, #1e2475 100%)', color: 'white', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, right: 0, opacity: 0.1, transform: 'scale(1.5) translate(10%, -10%)' }}>
+          <Shield size={400} />
+        </div>
+        <div className="container" style={{ position: 'relative', zIndex: 1, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '30px' }}>
+          <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} style={{ flex: '1 1 500px' }}>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '15px', lineHeight: 1.2 }}>Need a Professional Pest Inspection?</h2>
+            <p style={{ fontSize: '1.1rem', opacity: 0.9, marginBottom: '25px', maxWidth: '600px', lineHeight: 1.6 }}>
+              Don't let pests take over your home or business. Schedule a comprehensive inspection with our experts today and get a customized treatment plan.
+            </p>
+            <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+              <Link to="/book" className="btn" style={{ backgroundColor: 'var(--primary, #FFEE00)', color: '#1e293b', fontWeight: 'bold', padding: '12px 25px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', border: 'none', cursor: 'pointer', transition: 'transform 0.2s', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }} onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+                <CheckCircle2 size={20} /> Book Free Inspection
+              </Link>
+              <Link to="/contact" className="btn" style={{ backgroundColor: 'transparent', color: 'white', fontWeight: 'bold', padding: '12px 25px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', border: '2px solid white', cursor: 'pointer', transition: 'all 0.2s' }} onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'white'; e.currentTarget.style.color = 'var(--secondary, #2A329F)'; }} onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'white'; }}>
+                <PhoneCall size={20} /> Contact Us Now
+              </Link>
+            </div>
+          </motion.div>
+          
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} style={{ flex: '1 1 300px', display: 'flex', justifyContent: 'center' }}>
+            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '30px', borderRadius: '20px', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', width: '100%', maxWidth: '400px' }}>
+              <h3 style={{ fontSize: '1.4rem', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: '10px' }}>What to expect?</h3>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}><Search size={24} color="var(--primary, #FFEE00)" style={{ flexShrink: 0, marginTop: '2px' }} /> <span>Thorough property assessment inside and out</span></li>
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}><Bug size={24} color="var(--primary, #FFEE00)" style={{ flexShrink: 0, marginTop: '2px' }} /> <span>Identification of pest types and entry points</span></li>
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}><Shield size={24} color="var(--primary, #FFEE00)" style={{ flexShrink: 0, marginTop: '2px' }} /> <span>Tailored protection plan and cost estimate</span></li>
+              </ul>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
 
 
@@ -241,17 +345,17 @@ const Home = () => {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '30px', maxWidth: '1200px', margin: '0 auto' }}>
           {currentServices.map((service, idx) => (
-            <motion.div 
-              key={idx} 
-              initial={{ opacity: 0, y: 30 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              viewport={{ once: true }} 
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ delay: (idx % servicesPerPage) * 0.1 }}
-              onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}
+              onClick={() => navigate(service.path ? `/service/${service.path}` : `/service/${encodeURIComponent(service.service_name || '')}`)}
               className="service-card-modern"
             >
               <div className="service-card-img-container">
-                <img 
+                <img
                   src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}?t=${service.updated_at ? new Date(service.updated_at).getTime() : Date.now()}` : (service.service_image || '/logo.png')}
                   alt={service.service_name}
                   className="service-card-img"
@@ -278,7 +382,7 @@ const Home = () => {
             </motion.div>
           ))}
         </div>
-        
+
         {totalPages > 1 && (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '50px', flexWrap: 'wrap' }}>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
@@ -298,13 +402,13 @@ const Home = () => {
                   transition: 'all 0.2s',
                   boxShadow: currentPage === number ? '0 4px 6px rgba(42, 50, 159, 0.3)' : 'none'
                 }}
-                onMouseOver={(e) => { if(currentPage !== number) e.currentTarget.style.backgroundColor = '#cbd5e1'; }}
-                onMouseOut={(e) => { if(currentPage !== number) e.currentTarget.style.backgroundColor = '#e2e8f0'; }}
+                onMouseOver={(e) => { if (currentPage !== number) e.currentTarget.style.backgroundColor = '#cbd5e1'; }}
+                onMouseOut={(e) => { if (currentPage !== number) e.currentTarget.style.backgroundColor = '#e2e8f0'; }}
               >
                 {number}
               </button>
             ))}
-            
+
             <button
               onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}

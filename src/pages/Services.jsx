@@ -35,7 +35,8 @@ const Services = () => {
     { name: "Ants", path: "/service/ants", img: getServiceImage("Ants"), desc: "Targeted ant bait application to destroy colonies at their source." },
     { name: "Wood Borer", path: "/service/wood-borer", img: getServiceImage("Wood Borer"), desc: "Specialized chemical injection to preserve furniture from wood borers." },
     { name: "Herbal Pest Control", path: "/service/herbal-pest-control", img: getServiceImage("Herbal Pest Control"), desc: "Safe, natural, and highly effective herbal treatments for a chemical-free pest solution." },
-    { name: "Lizard Control", path: "/service/lizard-control", img: getServiceImage("Lizard"), desc: "Specialized and safe treatments to keep your premises free from lizards." }
+    { name: "Lizard Control", path: "/service/lizard-control", img: getServiceImage("Lizard"), desc: "Specialized and safe treatments to keep your premises free from lizards." },
+    { name: "General Pest Control", path: "/service/general", img: getServiceImage("General"), desc: "Comprehensive pest control coverage designed to keep your home safe from common household pests." }
   ];
 
   useEffect(() => {

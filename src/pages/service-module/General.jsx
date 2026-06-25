@@ -5,8 +5,8 @@ const General = () => {
   return (
     <ServiceLayout
       serviceName="General Pest Control"
-      title="Safe & Eco-Friendly Herbal Pest Control Solutions"
-      description="Diamond Pest Control offers professional herbal pest control services designed to protect your home and workplace using eco-friendly and plant-based treatment methods. Our herbal solutions help control pests while minimizing the use of harsh chemicals, making them a preferred choice for families, pets, and environmentally conscious customers."
+      title="Comprehensive General Pest Control Solutions"
+      description="Diamond Pest Control provides a comprehensive general pest control service to safeguard your residential or commercial space. This service addresses common nuisance pests, creating a protective barrier around your property to keep it safe, clean, and pest-free all year round."
       image="/Services/general-service.png"
       features={[
         "Eco-friendly pest management solution",

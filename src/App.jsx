@@ -26,6 +26,8 @@ import FlyControl from './pages/service-module/FlyControl';
 import Commercial from './pages/service-module/Commercial';
 import General from './pages/service-module/General';
 import HomeService from './pages/service-module/HomeService';
+import Lizards from './pages/service-module/Lizards';
+import Herbal from './pages/service-module/Herbal';
 
 import BlogList from './pages/BlogList';
 import BlogPost from './pages/BlogPost';
@@ -109,6 +111,8 @@ function App() {
           <Route path="/service/commercial" element={<Commercial />} />
           <Route path="/service/general" element={<General />} />
           <Route path="/service/home-service" element={<HomeService />} />
+          <Route path="/service/lizard-control" element={<Lizards />} />
+          <Route path="/service/herbal-pest-control" element={<Herbal />} />
           
           <Route path="/service/:name" element={<ServiceDetails />} />
           <Route path="/book" element={<BookService />} />
