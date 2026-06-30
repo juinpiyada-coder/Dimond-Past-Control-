@@ -1,45 +1,194 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home as HomeIcon, Video, Grid, User, ShoppingCart, MapPin, Search, Menu, X, ArrowRight, Bug, Activity, Shield, Clock, ThumbsUp, Star, ChevronDown, CheckCircle2, PhoneCall, Quote } from 'lucide-react';
+import { Home as HomeIcon, Video, Grid, User, ShoppingCart, MapPin, Search, Menu, X, ArrowRight, Bug, Activity, Shield, Clock, ThumbsUp, Star, ChevronDown, ChevronLeft, ChevronRight, CheckCircle2, PhoneCall, Quote, Building, Bird, Leaf } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { GiRat, GiAnt } from 'react-icons/gi';
 import { FaBug, FaBugs, FaMosquito, FaLocust } from 'react-icons/fa6';
 import { FaBed } from 'react-icons/fa';
+import { useQuery } from '@tanstack/react-query';
 import { apiCall } from '../utils/api';
+import CookieConsent from '../components/CookieConsent';
 
-const Home = () => {
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const navigate = useNavigate();
+import slider1 from '../assets/slider/slider-1.png';
+import slider2 from '../assets/slider/slider-2.png';
+import slider3 from '../assets/slider/slider-3.png';
+import slider4 from '../assets/slider/slider-4.png';
+import slider5 from '../assets/slider/slider-5.png';
+
+const AnimatedCounter = ({ end, suffix = '' }) => {
+  const [count, setCount] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+  const nodeRef = React.useRef(null);
 
   useEffect(() => {
-    apiCall('/services')
-      .then(data => {
-          if (Array.isArray(data) && data.length > 0) {
-            setServices(data);
-          }
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error("Failed to fetch services", err);
-          setLoading(false);
-        });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasStarted) {
+          setHasStarted(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (nodeRef.current) observer.observe(nodeRef.current);
+    return () => observer.disconnect();
+  }, [hasStarted]);
 
+  useEffect(() => {
+    if (!hasStarted) return;
+    let startTimestamp = null;
+    const duration = 2000;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      // Use easeOut cubic easing for a smoother finish
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(easeOut * end));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [hasStarted, end]);
+
+  return <span ref={nodeRef}>{count}{suffix}</span>;
+};
+
+const Home = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const ribbonRef = React.useRef(null);
+
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [hasDragged, setHasDragged] = useState(false);
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setHasDragged(false);
+    setStartX(e.pageX - ribbonRef.current.offsetLeft);
+    setScrollLeft(ribbonRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    setHasDragged(true);
+    const x = e.pageX - ribbonRef.current.offsetLeft;
+    const walk = (x - startX) * 2;
+    ribbonRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const sliderImages = [slider1, slider2, slider3, slider4, slider5];
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const servicesPerPage = 6;
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % sliderImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
   }, []);
 
+
+  const { data: services = [], isLoading: loading } = useQuery({
+    queryKey: ['services'],
+    queryFn: async () => {
+      const data = await apiCall('/services');
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  const { data: reviews = [] } = useQuery({
+    queryKey: ['reviews'],
+    queryFn: async () => {
+      const [revData, usersData] = await Promise.all([
+        apiCall('/reviews'),
+        apiCall('/users')
+      ]);
+      if (Array.isArray(revData) && Array.isArray(usersData)) {
+        return revData
+          .filter(r => r.status === 'APPROVED' || !r.status)
+          .map(r => {
+            const user = usersData.find(u => u.user_id === r.customer_id);
+            return {
+              ...r,
+              customer_name: user ? user.full_name : 'Customer'
+            };
+          });
+      }
+      return [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   const pestCategories = [
-    { name: "Cockroaches", icon: <FaBugs size={32} color="#2A329F" /> },
-    { name: "Termites", icon: <FaBug size={32} color="#2A329F" /> },
-    { name: "Bed Bugs", icon: <FaBed size={32} color="#2A329F" /> },
-    { name: "Rodents", icon: <GiRat size={32} color="#2A329F" /> },
-    { name: "Mosquitoes", icon: <FaMosquito size={32} color="#2A329F" /> },
-    { name: "Ants", icon: <GiAnt size={32} color="#2A329F" /> },
-    { name: "Wood Borer", icon: <FaLocust size={32} color="#2A329F" /> },
+    { name: "Cockroaches", path: "cockroaches", icon: <FaBugs size={32} color="#2A329F" /> },
+    { name: "Termites", path: "termites", icon: <FaBug size={32} color="#2A329F" /> },
+    { name: "Bed Bugs", path: "bed-bugs", icon: <FaBed size={32} color="#2A329F" /> },
+    { name: "Rodents", path: "rodents", icon: <GiRat size={32} color="#2A329F" /> },
+    { name: "Mosquitoes", path: "mosquitoes", icon: <FaMosquito size={32} color="#2A329F" /> },
+    { name: "Ants", path: "ants", icon: <GiAnt size={32} color="#2A329F" /> },
+    { name: "Wood Borer", path: "wood-borer", icon: <FaLocust size={32} color="#2A329F" /> },
+    { name: "Bird Control", path: "bird-control", icon: <Bird size={32} color="#2A329F" /> },
+    { name: "Fly Control", path: "fly-control", icon: <FaBug size={32} color="#2A329F" /> },
+    { name: "Commercial", path: "commercial", icon: <Building size={32} color="#2A329F" /> },
+    { name: "General", path: "general", icon: <Shield size={32} color="#2A329F" /> },
+    { name: "Home Service", path: "home-service", icon: <HomeIcon size={32} color="#2A329F" /> },
+    { name: "Lizard Control", path: "lizard-control", icon: <Bug size={32} color="#2A329F" /> },
+    { name: "Herbal Pest Control", path: "herbal-pest-control", icon: <Leaf size={32} color="#2A329F" /> },
   ];
 
-  
+
   const [openFaq, setOpenFaq] = useState(1);
+  const [reviewForm, setReviewForm] = useState({ rating: 5, review_text: '' });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const loggedInUser = JSON.parse(localStorage.getItem('user') || 'null');
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!loggedInUser) {
+      alert("Please login to submit a review.");
+      navigate('/auth');
+      return;
+    }
+    if (!reviewForm.review_text.trim()) {
+      alert("Please enter a review.");
+      return;
+    }
+    setIsSubmittingReview(true);
+    try {
+      const payload = {
+        customer_id: loggedInUser.user_id,
+        rating: reviewForm.rating,
+        review_text: reviewForm.review_text
+      };
+      const res = await apiCall('/reviews', 'POST', payload);
+      if (res && !res.error) {
+        alert("Review submitted successfully! It will be visible after approval.");
+        setReviewForm({ rating: 5, review_text: '' });
+      } else {
+        alert(res?.error || "Failed to submit review.");
+      }
+    } catch (error) {
+      alert(error.message || "Error submitting review.");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   const toggleFaq = (index) => {
     if (openFaq === index) {
@@ -49,10 +198,14 @@ const Home = () => {
     }
   };
 
-  const testimonials = [
-    { name: "Angan Chakraborty", text: "Excellent!! From start to finish, the communication was excellent, and they addressed all my concerns promptly. I highly recommend their services to anyone in need of reliable pest control solutions. Services of 'Diamond Pest Control' is only a phone-call away. Cordial and effective services rendered by it is an experience in itself. Dependability is its asset." },
-    { name: "AJIT Yadav", text: "Exceptional service! Diamond Pest Control Pvt Ltd exceeded my expectations. Their team was professional, knowledgeable, and efficient in handling my pest issues. From start to finish, the communication was excellent, and they addressed all my concerns promptly. I highly recommend their services." },
-    { name: "Rinky Chowdhury", text: "I recently booked their services for bedbugs. We had to take two sittings, however their service is absolutely satisfactory. They have provided very good relief from this serious concern we had been facing having a child at home. They are punctual and very fast at replying. I am very much happy with their performance. Thank you ! Would surely recommend" }
+  const testimonials = reviews.length > 0 ? reviews.map(r => ({
+    name: r.customer_name,
+    text: r.review_text,
+    rating: r.rating || 5
+  })) : [
+    { name: "Angan Chakraborty", text: "Excellent!! From start to finish, the communication was excellent, and they addressed all my concerns promptly. I highly recommend their services to anyone in need of reliable pest control solutions.", rating: 5 },
+    { name: "AJIT Yadav", text: "Exceptional service! Diamond Pest Control Pvt Ltd exceeded my expectations. Their team was professional, knowledgeable, and efficient.", rating: 5 },
+    { name: "Rinky Chowdhury", text: "I recently booked their services for bedbugs. They are punctual and very fast at replying. I am very much happy with their performance.", rating: 5 }
   ];
 
   const faqs = [
@@ -68,10 +221,37 @@ const Home = () => {
   const fadeInRight = { hidden: { opacity: 0, x: 50 }, visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } } };
   const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.2 } } };
 
+  // Pagination calculations
+  const processedServices = services.map(s => {
+    const sName = s?.service_name?.toLowerCase() || '';
+    let newService = { ...s };
+    if (sName.includes('herbal')) {
+      newService.path = "herbal-pest-control";
+      newService.base_price = "0";
+    }
+    if (sName.includes('lizard')) {
+      newService.path = "lizard-control";
+    }
+    return newService;
+  });
+
+  const combinedServices = [
+    { service_name: "General Pest Control", description: "Comprehensive pest control coverage designed to keep your home safe from common household pests.", service_image: "Services/general-service.png", base_price: "0", path: "general" },
+    ...processedServices.filter(s => s?.service_name?.toLowerCase() !== 'general pest control')
+  ];
+  const indexOfLastService = currentPage * servicesPerPage;
+  const indexOfFirstService = indexOfLastService - servicesPerPage;
+  const currentServices = combinedServices.slice(indexOfFirstService, indexOfLastService);
+  const totalPages = Math.ceil(combinedServices.length / servicesPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div className="fk-home-container">
       {/* Sidebar Overlay */}
-      <div 
+      <div
         className={`fk-sidebar-overlay ${isSidebarOpen ? 'open' : ''}`}
         onClick={() => setIsSidebarOpen(false)}
       ></div>
@@ -84,10 +264,10 @@ const Home = () => {
             <div style={{ fontWeight: 'bold' }}>Hello, User</div>
             <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>Login / Sign Up</div>
           </div>
-          <X 
-            size={24} 
-            style={{ marginLeft: 'auto', cursor: 'pointer' }} 
-            onClick={() => setIsSidebarOpen(false)} 
+          <X
+            size={24}
+            style={{ marginLeft: 'auto', cursor: 'pointer' }}
+            onClick={() => setIsSidebarOpen(false)}
           />
         </div>
         <ul className="fk-sidebar-menu">
@@ -95,10 +275,10 @@ const Home = () => {
             PEST CATEGORIES
           </li>
           {pestCategories.map((cat, idx) => (
-            <Link key={idx} to={`/service/${encodeURIComponent(cat.name)}`} className="fk-sidebar-menu-item" onClick={() => setIsSidebarOpen(false)}>
+            <Link key={idx} to={`/service/${cat.path}`} className="fk-sidebar-menu-item" onClick={() => setIsSidebarOpen(false)}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px' }}>
                 {React.cloneElement(cat.icon, { size: 20, color: "#878787" })}
-              </div> 
+              </div>
               {cat.name} Treatment
             </Link>
           ))}
@@ -116,94 +296,175 @@ const Home = () => {
 
 
 
-      {/* Category Ribbon */}
-      <div className="fk-category-ribbon">
-        <div className="fk-category-item" onClick={() => setIsSidebarOpen(true)}>
-          <div className="fk-category-icon-wrapper">
-            <Menu size={32} color="#2A329F" />
-          </div>
-          <span className="fk-category-text">All Pests</span>
-        </div>
-        {pestCategories.map((cat, idx) => (
-          <Link to={`/service/${encodeURIComponent(cat.name)}`} key={idx} className="fk-category-item" style={{ textDecoration: 'none' }}>
-            <div className="fk-category-icon-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {cat.icon}
-            </div>
-            <span className="fk-category-text">{cat.name}</span>
-          </Link>
+      {/* Hero Slider */}
+      <div className="hero-slider-container">
+        {sliderImages.map((img, index) => (
+          <img
+            key={index}
+            src={img}
+            alt={`Slide ${index + 1}`}
+            className="hero-slider-img"
+            style={{ opacity: currentSlide === index ? 1 : 0 }}
+          />
         ))}
-      </div>
-
-      {/* Promotional Banner */}
-      <div className="fk-promo-banner-container">
-        <div className="fk-promo-banner">
-          <img src="/WhatsApp-Image-2026-05-21-at-4.46.12-PM.jpeg" alt="Pest Control Sale" style={{ height: '200px', objectFit: 'cover' }} />
-          <div style={{ position: 'absolute', top: '20px', left: '20px', background: 'rgba(255,238,0,0.9)', padding: '10px 15px', borderRadius: '8px' }}>
-            <h2 style={{ margin: 0, fontSize: '1.4rem', color: '#111' }}>Epic Monsoon Sale</h2>
-            <p style={{ margin: '5px 0 0 0', fontWeight: 'bold', color: '#c40000' }}>Flat ₹500 Off*</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Yellow Deals Section */}
-      <div className="fk-yellow-deals-section">
-        <div className="fk-deals-header">
-          <span className="fk-deals-title">Top Pest Treatments</span>
-          <Link to="/services" style={{ background: '#2874f0', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            View All <ArrowRight size={14} />
-          </Link>
-        </div>
-        <div className="fk-deals-scroll">
-          {services.slice(0, 5).map((service, idx) => (
-              <div key={idx} className="fk-deal-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
-                <img 
-                  src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')} 
-                  alt={service.service_name} 
-                  className="fk-deal-card-img" 
-                  onError={(e) => { e.target.onerror = null; e.target.src = '/logo.png'; }}
-                />
-                <span className="fk-deal-card-title">{service.service_name}</span>
-                <span className="fk-deal-card-action">Book Now</span>
-              </div>
-            ))
-          }
-        </div>
-      </div>
-
-      {/* Suggested For You Grid */}
-      <div className="fk-suggested-section">
-        <div className="fk-suggested-header">
-          Suggested For You
-          <span style={{ fontSize: '0.8rem', color: '#878787', fontWeight: 'normal' }}>Sponsored</span>
-        </div>
-        <div className="fk-suggested-grid">
-          {services.map((service, idx) => (
-            <div key={idx} className="fk-suggested-card" onClick={() => navigate(`/service/${encodeURIComponent(service.service_name)}`)}>
-              <div className="fk-suggested-card-img-wrapper">
-                <img 
-                  src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}` : (service.service_image || '/logo.png')} 
-                  alt={service.service_name} 
-                  className="fk-suggested-card-img"
-                  onError={(e) => { e.target.onerror = null; e.target.src = '/logo.png'; }}
-                />
-              </div>
-              <div className="fk-suggested-card-body">
-                <div className="fk-suggested-card-title">{service.service_name} Treatment</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  <span style={{ fontWeight: 'bold', color: '#212121' }}>₹{service.base_price}</span>
-                  <span style={{ fontSize: '0.75rem', color: '#878787', textDecoration: 'line-through' }}>₹{service.base_price + 500}</span>
-                </div>
-              </div>
-            </div>
+        {/* Slider Dots */}
+        <div className="hero-slider-dots">
+          {sliderImages.map((_, index) => (
+            <div
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className="slider-dot"
+              style={{
+                backgroundColor: currentSlide === index ? 'var(--primary, #FFEE00)' : 'rgba(255,255,255,0.6)',
+                transform: currentSlide === index ? 'scale(1.2)' : 'scale(1)',
+              }}
+            />
           ))}
         </div>
       </div>
 
-      
+      {/* Category Ribbon */}
+      <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
+
+        <div 
+          ref={ribbonRef} 
+          className="fk-category-ribbon" 
+          style={{ overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none', display: 'flex', padding: '15px 40px', scrollBehavior: isDragging ? 'auto' : 'smooth', cursor: isDragging ? 'grabbing' : 'grab' }}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+        >
+          <style dangerouslySetInnerHTML={{__html: `.fk-category-ribbon::-webkit-scrollbar { display: none; }`}} />
+          <div className="fk-category-item" style={{ flexShrink: 0 }} onClick={(e) => { if (hasDragged) { e.preventDefault(); e.stopPropagation(); } else { setIsSidebarOpen(true); } }}>
+            <div className="fk-category-icon-wrapper">
+              <Menu size={32} color="#2A329F" />
+            </div>
+            <span className="fk-category-text">All Pests</span>
+          </div>
+          {pestCategories.map((cat, idx) => (
+            <Link 
+              to={`/service/${cat.path}`} 
+              key={idx} 
+              className="fk-category-item" 
+              style={{ textDecoration: 'none', flexShrink: 0 }}
+              draggable={false}
+              onClick={(e) => { if (hasDragged) { e.preventDefault(); e.stopPropagation(); } }}
+            >
+              <div className="fk-category-icon-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {cat.icon}
+              </div>
+              <span className="fk-category-text">{cat.name}</span>
+            </Link>
+          ))}
+        </div>
+
+      </div>
+
+
+
+      {/* Custom Products Section */}
+      <section className="custom-services-section" style={{ padding: '60px 20px', backgroundColor: '#f8fafc' }}>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <motion.h4 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ color: 'var(--secondary, #2A329F)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '10px', fontSize: '0.9rem' }}>Our Services</motion.h4>
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} style={{ fontSize: '2.4rem', color: '#1e293b', fontWeight: '800', lineHeight: 1.2 }}>Premium Pest Control Services</motion.h2>
+          <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} style={{ color: '#64748b', maxWidth: '600px', margin: '15px auto 0', fontSize: '1.05rem', lineHeight: 1.6 }}>Explore our range of highly effective pest control services for your home and business.</motion.p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '30px', maxWidth: '1200px', margin: '0 auto' }}>
+          {currentServices.map((service, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: (idx % servicesPerPage) * 0.1 }}
+              onClick={() => navigate(service.path ? `/service/${service.path}` : `/service/${encodeURIComponent(service.service_name || '')}`)}
+              className="service-card-modern"
+            >
+              <div className="service-card-img-container">
+                <img
+                  src={service.service_image?.startsWith('/') ? `${(import.meta.env.VITE_API_BASE_URL || '').replace('/api', '')}${service.service_image}?t=${service.updated_at ? new Date(service.updated_at).getTime() : Date.now()}` : (service.service_image || '/logo.png')}
+                  alt={service.service_name}
+                  className="service-card-img"
+                  onError={(e) => { e.target.onerror = null; e.target.src = '/logo.png'; }}
+                />
+                <div className="service-price-tag">
+                  ₹{service.base_price}
+                </div>
+              </div>
+              <div className="service-card-content">
+                <h3 className="service-card-title">{service.service_name}</h3>
+                <p className="service-card-desc">
+                  {service.description || 'Professional pest control treatment providing complete eradication and long-term protection for your property.'}
+                </p>
+                <div className="service-card-footer">
+                  <span style={{ color: 'var(--secondary, #2A329F)', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.95rem' }}>
+                    View Details <ArrowRight size={18} />
+                  </span>
+                  <div style={{ display: 'flex', gap: '4px', color: '#fbbf24' }}>
+                    <Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {totalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '50px', flexWrap: 'wrap' }}>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+              <button
+                key={number}
+                onClick={() => handlePageChange(number)}
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  border: 'none',
+                  backgroundColor: currentPage === number ? 'var(--secondary, #2A329F)' : '#e2e8f0',
+                  color: currentPage === number ? 'white' : '#475569',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: currentPage === number ? '0 4px 6px rgba(42, 50, 159, 0.3)' : 'none'
+                }}
+                onMouseOver={(e) => { if (currentPage !== number) e.currentTarget.style.backgroundColor = '#cbd5e1'; }}
+                onMouseOut={(e) => { if (currentPage !== number) e.currentTarget.style.backgroundColor = '#e2e8f0'; }}
+              >
+                {number}
+              </button>
+            ))}
+
+            <button
+              onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              style={{
+                padding: '0 15px',
+                height: '40px',
+                borderRadius: '20px',
+                border: 'none',
+                backgroundColor: currentPage === totalPages ? '#e2e8f0' : 'var(--secondary, #2A329F)',
+                color: currentPage === totalPages ? '#94a3b8' : 'white',
+                fontWeight: 'bold',
+                cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                opacity: currentPage === totalPages ? 0.6 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              Next <ArrowRight size={16} />
+            </button>
+          </div>
+        )}
+      </section>
 
       {/* Legacy Content Integrated Below E-commerce layout */}
       <div className="legacy-content-wrapper" style={{ backgroundColor: '#fff' }}>
-        
+
         {/* Intro Section */}
         <section className="intro-section section-padding container" style={{ marginTop: '20px' }}>
           <div className="intro-grid">
@@ -219,7 +480,7 @@ const Home = () => {
               </motion.div>
             </motion.div>
             <motion.div className="intro-image" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeInRight}>
-              <motion.img whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }} src="/WhatsApp-Image-2026-05-21-at-4.46.12-PM.jpeg" alt="Diamond Pest Control professional" className="featured-image rounded-2xl shadow-2xl" />
+              <motion.img whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }} src="/hero-img/hero-1.png" alt="Diamond Pest Control professional" className="featured-image rounded-2xl shadow-2xl" />
             </motion.div>
           </div>
         </section>
@@ -228,9 +489,7 @@ const Home = () => {
         <section className="who-we-are bg-light section-padding">
           <div className="container intro-grid">
             <motion.div className="intro-image" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeInLeft}>
-              <motion.div whileHover={{ rotate: 5, scale: 1.05 }} className="image-placeholder secondary-bg shadow-xl">
-                <ThumbsUp size={100} className="placeholder-icon" />
-              </motion.div>
+              <motion.img whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }} src="/hero-img/hero-2.png" alt="Pest Control Service" className="featured-image rounded-2xl shadow-2xl" />
             </motion.div>
             <motion.div className="intro-text" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
               <motion.h4 variants={fadeInRight} className="section-subtitle">WHO WE ARE</motion.h4>
@@ -255,9 +514,9 @@ const Home = () => {
             <motion.h4 variants={fadeInUp} className="section-subtitle white">OUR ACHIEVEMENT</motion.h4>
             <motion.h2 variants={fadeInUp}>Celebrating Excellence in Pest Control</motion.h2>
             <motion.div variants={staggerContainer} className="achievement-stats">
-              <motion.div variants={fadeInUp} className="stat-box"><h3>5000+</h3><p>Happy Clients</p></motion.div>
-              <motion.div variants={fadeInUp} className="stat-box"><h3>15+</h3><p>Years Experience</p></motion.div>
-              <motion.div variants={fadeInUp} className="stat-box"><h3>100%</h3><p>Safe Chemicals</p></motion.div>
+              <motion.div variants={fadeInUp} className="stat-box"><h3><AnimatedCounter end={40} suffix="k+" /></h3><p>Happy Clients</p></motion.div>
+              <motion.div variants={fadeInUp} className="stat-box"><h3><AnimatedCounter end={30} suffix="+" /></h3><p>Years Experience</p></motion.div>
+              <motion.div variants={fadeInUp} className="stat-box"><h3><AnimatedCounter end={100} suffix="%" /></h3><p>Safe Chemicals</p></motion.div>
             </motion.div>
           </div>
         </motion.section>
@@ -308,15 +567,61 @@ const Home = () => {
                 {[...testimonials, ...testimonials].map((t, idx) => (
                   <div key={idx} className="testimonial-card shadow-lg" style={{ minWidth: 'min(100vw - 40px, 350px)', maxWidth: '400px', whiteSpace: 'normal', flexShrink: 0 }}>
                     <Quote size={40} className="quote-icon opacity-20" />
+                    <div style={{ display: 'flex', gap: '4px', color: '#fbbf24', marginBottom: '10px' }}>
+                      {Array.from({ length: t.rating || 5 }).map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+                    </div>
                     <p className="testimonial-text">"{t.text}"</p>
-                    <div className="testimonial-author">
-                      <h4>{t.name}</h4>
-                      <span>Pest control service in kolkata</span>
+                    <div className="testimonial-author mt-4">
+                      <h4 style={{ fontWeight: 'bold' }}>{t.name}</h4>
+                      <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Verified Customer</span>
                     </div>
                   </div>
                 ))}
               </motion.div>
             </div>
+            
+            {/* Submit Review Form */}
+            <div className="mt-12" style={{ maxWidth: '600px', margin: '3rem auto 0', background: 'white', padding: '2rem', borderRadius: '1rem', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', textAlign: 'center' }}>Leave a Review</h3>
+              <form onSubmit={handleReviewSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Rating</label>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <Star 
+                        key={star} 
+                        size={28} 
+                        fill={star <= reviewForm.rating ? '#fbbf24' : 'none'} 
+                        color={star <= reviewForm.rating ? '#fbbf24' : '#cbd5e1'}
+                        style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                        onClick={() => setReviewForm(prev => ({ ...prev, rating: star }))}
+                        onMouseOver={(e) => { e.currentTarget.style.transform = 'scale(1.2)' }}
+                        onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Your Review</label>
+                  <textarea 
+                    value={reviewForm.review_text}
+                    onChange={(e) => setReviewForm(prev => ({ ...prev, review_text: e.target.value }))}
+                    rows="4" 
+                    placeholder="Tell us about your experience..."
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', resize: 'vertical' }}
+                    required
+                  ></textarea>
+                </div>
+                <button 
+                  type="submit" 
+                  disabled={isSubmittingReview}
+                  style={{ padding: '0.75rem 1.5rem', backgroundColor: 'var(--secondary, #2A329F)', color: 'white', fontWeight: 'bold', border: 'none', borderRadius: '0.5rem', cursor: isSubmittingReview ? 'not-allowed' : 'pointer', opacity: isSubmittingReview ? 0.7 : 1 }}
+                >
+                  {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+                </button>
+              </form>
+            </div>
+            
           </div>
         </section>
 
@@ -346,16 +651,12 @@ const Home = () => {
                   </motion.div>
                 </motion.div>
               ))}
-              <motion.div variants={fadeInRight} className="faq-footer-help mt-8 p-6 bg-white rounded-xl shadow-md text-center">
-                <h4>Still have questions?</h4>
-                <Link to="/contact" className="btn btn-secondary mt-4 inline-block">Contact Us</Link>
-              </motion.div>
             </motion.div>
           </div>
         </section>
       </div>
 
-
+      <CookieConsent />
     </div>
   );
 };

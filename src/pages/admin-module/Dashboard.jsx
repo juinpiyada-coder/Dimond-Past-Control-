@@ -3,8 +3,18 @@ import { apiCall } from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import BlogDataEntry from './BlogDataEntry';
 import UserDataEntry from './UserDataEntry';
+import EmployeeDataEntry from './EmployeeDataEntry';
+import CustomerDataEntry from './CustomerDataEntry';
+import CustomerDetails from './CustomerDetails';
+import RoleDataEntry from './RoleDataEntry';
+import MailCenter from './MailCenter';
+import SettingsModule from './SettingsModule';
+import ModuleLauncher from './ModuleLauncher';
+import MenuConfigModule from './MenuConfigModule';
+import OverviewModule from './OverviewModule';
 import GenericModule from './GenericModule';
-import { FiGrid, FiFileText, FiUsers, FiSettings, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiImage, FiTool, FiStar, FiShare2, FiShield, FiFile, FiCalendar, FiBriefcase, FiMenu, FiChevronDown, FiChevronRight } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import { FiGrid, FiFileText, FiUsers, FiSettings, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiImage, FiTool, FiStar, FiShare2, FiShield, FiFile, FiCalendar, FiBriefcase, FiMenu, FiChevronDown, FiChevronRight, FiMail, FiUserCheck, FiUser } from 'react-icons/fi';
 
 const Dashboard = () => {
   const [blogs, setBlogs] = useState([]);
@@ -26,6 +36,28 @@ const Dashboard = () => {
   const [userView, setUserView] = useState('grid');
   const [editingUserId, setEditingUserId] = useState(null);
 
+  // Employees State
+  const [employees, setEmployees] = useState([]);
+  const [employeeView, setEmployeeView] = useState('grid');
+  const [editingEmployeeId, setEditingEmployeeId] = useState(null);
+
+  // Customers State
+  const [customers, setCustomers] = useState([]);
+  const [customerView, setCustomerView] = useState('grid'); // 'grid', 'editor', 'details'
+  const [activeCustomerId, setActiveCustomerId] = useState(null);
+
+  // Roles State
+  const [roles, setRoles] = useState([]);
+  const [roleView, setRoleView] = useState('grid');
+  const [editingRoleId, setEditingRoleId] = useState(null);
+
+  // System Preferences
+  const [preferences, setPreferences] = useState({
+    testMode: false,
+    fullLoader: false,
+    showHeader: true
+  });
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -40,7 +72,16 @@ const Dashboard = () => {
     if (activeTab === 'users' && userView === 'grid') {
       fetchUsers();
     }
-  }, [activeTab, blogView, userView]);
+    if (activeTab === 'employees' && employeeView === 'grid') {
+      fetchEmployees();
+    }
+    if (activeTab === 'customers' && customerView === 'grid') {
+      fetchCustomers();
+    }
+    if (activeTab === 'roles' && roleView === 'grid') {
+      fetchRoles();
+    }
+  }, [activeTab, blogView, userView, employeeView, customerView, roleView]);
 
   const fetchBlogs = async () => {
     setLoading(true);
@@ -66,9 +107,10 @@ const Dashboard = () => {
     if (!window.confirm('Are you sure you want to delete this blog post?')) return;
     try {
       await apiCall(`/blogs/${id}`, 'DELETE');
+      toast.success('Blog post deleted successfully.');
       fetchBlogs();
     } catch (err) {
-      alert('Delete failed: ' + err.message);
+      toast.error('Delete failed: ' + err.message);
     }
   };
 
@@ -106,9 +148,10 @@ const Dashboard = () => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
       await apiCall(`/users/${id}`, 'DELETE');
+      toast.success('User deleted successfully.');
       fetchUsers();
     } catch (err) {
-      alert('Delete failed: ' + err.message);
+      toast.error('Delete failed: ' + err.message);
     }
   };
 
@@ -120,6 +163,124 @@ const Dashboard = () => {
   const closeUserEditor = () => {
     setEditingUserId(null);
     setUserView('grid');
+  };
+
+  const fetchEmployees = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const result = await apiCall('/employees');
+      if (Array.isArray(result)) {
+        setEmployees(result);
+      } else if (result && result.error) {
+        throw new Error(result.error);
+      } else {
+        setEmployees([]);
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to fetch employees');
+      setEmployees([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteEmployee = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this employee?')) return;
+    try {
+      await apiCall(`/employees/${id}`, 'DELETE');
+      toast.success('Employee deleted successfully.');
+      fetchEmployees();
+    } catch (err) {
+      toast.error('Delete failed: ' + err.message);
+    }
+  };
+
+  const openEmployeeEditor = (id = null) => {
+    setEditingEmployeeId(id);
+    setEmployeeView('editor');
+  };
+
+  const closeEmployeeEditor = () => {
+    setEditingEmployeeId(null);
+    setEmployeeView('grid');
+  };
+
+  const fetchCustomers = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const result = await apiCall('/users');
+      if (Array.isArray(result)) {
+        // Filter only customers (role_id 5)
+        setCustomers(result.filter(u => u.role_id == 5));
+      } else if (result && result.error) {
+        throw new Error(result.error);
+      } else {
+        setCustomers([]);
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to fetch customers');
+      setCustomers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openCustomerEditor = (id = null) => {
+    setActiveCustomerId(id);
+    setCustomerView('editor');
+  };
+
+  const openCustomerDetails = (id) => {
+    setActiveCustomerId(id);
+    setCustomerView('details');
+  };
+
+  const closeCustomerEditor = () => {
+    setActiveCustomerId(null);
+    setCustomerView('grid');
+  };
+
+  const fetchRoles = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const result = await apiCall('/roles');
+      if (Array.isArray(result)) {
+        setRoles(result);
+      } else if (result && result.error) {
+        throw new Error(result.error);
+      } else {
+        setRoles([]);
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to fetch roles');
+      setRoles([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteRole = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this role?')) return;
+    try {
+      await apiCall(`/roles/${id}`, 'DELETE');
+      toast.success('Role deleted successfully.');
+      fetchRoles();
+    } catch (err) {
+      toast.error('Delete failed: ' + err.message);
+    }
+  };
+
+  const openRoleEditor = (id = null) => {
+    setEditingRoleId(id);
+    setRoleView('editor');
+  };
+
+  const closeRoleEditor = () => {
+    setEditingRoleId(null);
+    setRoleView('grid');
   };
 
   const handleLogout = () => {
@@ -227,8 +388,8 @@ const Dashboard = () => {
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <div>
-          <h1 style={{ margin: 0, color: '#0f172a', fontSize: '2.25rem', fontWeight: 700, letterSpacing: '-0.025em' }}>User Management</h1>
-          <p style={{ color: '#64748b', margin: '0.5rem 0 0 0', fontSize: '1rem' }}>Manage your administrators, customers, and employees.</p>
+          <h1 style={{ margin: 0, color: '#0f172a', fontSize: '2.25rem', fontWeight: 700, letterSpacing: '-0.025em' }}>System Users</h1>
+          <p style={{ color: '#64748b', margin: '0.5rem 0 0 0', fontSize: '1rem' }}>Manage your administrators and internal staff access.</p>
         </div>
         <button 
           onClick={() => openUserEditor()}
@@ -241,8 +402,8 @@ const Dashboard = () => {
       {error && users.length === 0 ? (
         <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '1rem 1.5rem', borderRadius: '0.75rem' }}>{error}</div>
       ) : (
-        <div style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <div className="admin-table-wrapper" style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
             <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
               <tr>
                 <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Name</th>
@@ -290,11 +451,199 @@ const Dashboard = () => {
     </>
   );
 
+  const renderEmployeeGrid = () => (
+    <>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+        <div>
+          <h1 style={{ margin: 0, color: '#0f172a', fontSize: '2.25rem', fontWeight: 700, letterSpacing: '-0.025em' }}>Employee Operations</h1>
+          <p style={{ color: '#64748b', margin: '0.5rem 0 0 0', fontSize: '1rem' }}>Manage your field technicians, back-office staff, and operational identity details.</p>
+        </div>
+        <button 
+          onClick={() => openEmployeeEditor()}
+          style={{ backgroundColor: '#2563eb', color: 'white', border: 'none', padding: '0.875rem 1.75rem', borderRadius: '0.75rem', cursor: 'pointer', fontWeight: 600, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 14px 0 rgba(37, 99, 235, 0.39)', transition: 'all 0.2s ease-in-out' }}
+        >
+          <FiPlus size={18} /> Onboard Employee
+        </button>
+      </div>
+
+      {error && employees.length === 0 ? (
+        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '1rem 1.5rem', borderRadius: '0.75rem' }}>{error}</div>
+      ) : (
+        <div className="admin-table-wrapper" style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+            <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+              <tr>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Emp. Code</th>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Designation</th>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Joining Date</th>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Vehicle No.</th>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem', textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {employees.map(emp => (
+                <tr key={emp.employee_id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#0f172a' }}>{emp.employee_code}</td>
+                  <td style={{ padding: '1rem 1.5rem', color: '#64748b', fontSize: '0.875rem' }}>{emp.designation}</td>
+                  <td style={{ padding: '1rem 1.5rem', color: '#64748b', fontSize: '0.875rem' }}>{emp.joining_date}</td>
+                  <td style={{ padding: '1rem 1.5rem', color: '#64748b', fontSize: '0.875rem' }}>{emp.vehicle_number || 'N/A'}</td>
+                  <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                      <button onClick={() => openEmployeeEditor(emp.employee_id)} style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0', backgroundColor: 'white', color: '#64748b', cursor: 'pointer' }}><FiEdit2 size={16} /></button>
+                      <button onClick={() => handleDeleteEmployee(emp.employee_id)} style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0', backgroundColor: '#fef2f2', color: '#ef4444', cursor: 'pointer' }}><FiTrash2 size={16} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {employees.length === 0 && !loading && (
+                <tr>
+                  <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>No operational employees onboarded yet.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  );
+
+  const renderCustomerGrid = () => (
+    <>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+        <div>
+          <h1 style={{ margin: 0, color: '#0f172a', fontSize: '2.25rem', fontWeight: 700, letterSpacing: '-0.025em' }}>Client Directory</h1>
+          <p style={{ color: '#64748b', margin: '0.5rem 0 0 0', fontSize: '1rem' }}>Manage your customers, their profiles, and engagement.</p>
+        </div>
+        <button 
+          onClick={() => openCustomerEditor()}
+          style={{ backgroundColor: '#2563eb', color: 'white', border: 'none', padding: '0.875rem 1.75rem', borderRadius: '0.75rem', cursor: 'pointer', fontWeight: 600, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 14px 0 rgba(37, 99, 235, 0.39)', transition: 'all 0.2s ease-in-out' }}
+        >
+          <FiPlus size={18} /> Add New Customer
+        </button>
+      </div>
+
+      {error && customers.length === 0 ? (
+        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '1rem 1.5rem', borderRadius: '0.75rem' }}>{error}</div>
+      ) : (
+        <div className="admin-table-wrapper" style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+            <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+              <tr>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Client Name</th>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Contact</th>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Status</th>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem', textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {customers.map(cust => (
+                <tr key={cust.user_id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#0f172a' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                        {cust.full_name.charAt(0).toUpperCase()}
+                      </div>
+                      {cust.full_name}
+                    </div>
+                  </td>
+                  <td style={{ padding: '1rem 1.5rem', color: '#64748b', fontSize: '0.875rem' }}>
+                    <div>{cust.email || 'N/A'}</div>
+                    <div style={{ marginTop: '0.25rem', color: '#0f172a' }}>{cust.phone}</div>
+                  </td>
+                  <td style={{ padding: '1rem 1.5rem' }}>
+                    <span style={{ backgroundColor: cust.status === 'ACTIVE' ? '#dcfce7' : '#fef2f2', color: cust.status === 'ACTIVE' ? '#166534' : '#991b1b', padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600 }}>
+                      {cust.status}
+                    </span>
+                  </td>
+                  <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                      <button onClick={() => openCustomerDetails(cust.user_id)} title="View Profile" style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0', backgroundColor: '#eff6ff', color: '#2563eb', cursor: 'pointer' }}><FiUser size={16} /></button>
+                      <button onClick={() => openCustomerEditor(cust.user_id)} title="Edit Details" style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0', backgroundColor: 'white', color: '#64748b', cursor: 'pointer' }}><FiEdit2 size={16} /></button>
+                      <button onClick={() => handleDeleteUser(cust.user_id)} title="Delete Client" style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0', backgroundColor: '#fef2f2', color: '#ef4444', cursor: 'pointer' }}><FiTrash2 size={16} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {customers.length === 0 && !loading && (
+                <tr>
+                  <td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>No customers found in directory.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  );
+
+  const renderRoleGrid = () => (
+    <>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div>
+          <h2 style={{ margin: 0, color: '#0f172a', fontSize: '1.5rem', fontWeight: 700 }}>System Roles</h2>
+          <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.875rem' }}>Manage role-based access definitions.</p>
+        </div>
+        <button 
+          onClick={() => openRoleEditor()}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#2563eb', color: 'white', border: 'none', padding: '0.625rem 1.25rem', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer', transition: 'background-color 0.2s', boxShadow: '0 4px 6px -1px rgba(37,99,235,0.2)' }}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'}
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
+        >
+          <FiPlus /> Add New Role
+        </button>
+      </div>
+
+      {loading && roles.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>Loading roles...</div>
+      ) : error ? (
+        <div style={{ textAlign: 'center', padding: '3rem', color: '#ef4444', backgroundColor: '#fef2f2', borderRadius: '0.75rem', border: '1px solid #fecaca' }}>{error}</div>
+      ) : (
+        <div className="admin-table-wrapper" style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Role Name</th>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Role Code</th>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>Description</th>
+                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.875rem', textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {roles.map(role => (
+                <tr key={role.role_id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '1rem 1.5rem', fontWeight: 600, color: '#0f172a' }}>{role.role_name}</td>
+                  <td style={{ padding: '1rem 1.5rem' }}>
+                    <span style={{ backgroundColor: '#e0e7ff', color: '#3730a3', padding: '0.25rem 0.5rem', borderRadius: '0.375rem', fontSize: '0.75rem', fontWeight: 600, fontFamily: 'monospace' }}>
+                      {role.role_code}
+                    </span>
+                  </td>
+                  <td style={{ padding: '1rem 1.5rem', color: '#64748b', fontSize: '0.875rem' }}>{role.description || 'No description'}</td>
+                  <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                      <button onClick={() => openRoleEditor(role.role_id)} title="Edit Role" style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0', backgroundColor: 'white', color: '#64748b', cursor: 'pointer' }}><FiEdit2 size={16} /></button>
+                      <button onClick={() => handleDeleteRole(role.role_id)} title="Delete Role" style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0', backgroundColor: '#fef2f2', color: '#ef4444', cursor: 'pointer' }}><FiTrash2 size={16} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {roles.length === 0 && !loading && (
+                <tr>
+                  <td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>No roles found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  );
+
   const navGroups = [
     {
       groupLabel: 'Overview',
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: <FiGrid size={20} /> },
+        { id: 'launcher', label: 'App Launcher', icon: <FiGrid size={20} /> },
       ]
     },
     {
@@ -302,14 +651,16 @@ const Dashboard = () => {
       items: [
         { id: 'bookings', label: 'Bookings', icon: <FiCalendar size={20} /> },
         { id: 'employee_assignments', label: 'Assignments', icon: <FiBriefcase size={20} /> },
-        { id: 'service_images', label: 'Service Images', icon: <FiImage size={20} /> },
         { id: 'invoices', label: 'Invoices', icon: <FiFile size={20} /> },
+        { id: 'guarantee_cards', label: 'Guarantee Cards', icon: <FiShield size={20} /> },
       ]
     },
     {
       groupLabel: 'Master Data',
       items: [
-        { id: 'users', label: 'Users', icon: <FiUsers size={20} /> },
+        { id: 'customers', label: 'Customers', icon: <FiUsers size={20} /> },
+        { id: 'users', label: 'System Users', icon: <FiSettings size={20} /> },
+        { id: 'employees', label: 'Employees', icon: <FiUserCheck size={20} /> },
         { id: 'services', label: 'Services', icon: <FiTool size={20} /> },
         { id: 'pest_types', label: 'Pest Types', icon: <FiShield size={20} /> },
       ]
@@ -318,6 +669,7 @@ const Dashboard = () => {
       groupLabel: 'Marketing',
       items: [
         { id: 'blogs', label: 'Blogs', icon: <FiFileText size={20} /> },
+        { id: 'mail_center', label: 'Mail Center', icon: <FiMail size={20} /> },
         { id: 'reviews', label: 'Reviews', icon: <FiStar size={20} /> },
         { id: 'referrals', label: 'Referrals', icon: <FiShare2 size={20} /> },
       ]
@@ -325,6 +677,8 @@ const Dashboard = () => {
     {
       groupLabel: 'System',
       items: [
+        { id: 'roles', label: 'Access Roles', icon: <FiShield size={20} /> },
+        { id: 'menus', label: 'Menu Config', icon: <FiMenu size={20} /> },
         { id: 'settings', label: 'Settings', icon: <FiSettings size={20} /> }
       ]
     }
@@ -352,7 +706,7 @@ const Dashboard = () => {
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc', fontFamily: '"Inter", "Segoe UI", Roboto, sans-serif' }}>
       
       {/* Professional Sidebar */}
-      <div style={{ 
+      <div className="admin-sidebar-mobile" style={{ 
         width: isSidebarOpen ? '280px' : '0px', 
         backgroundColor: '#ffffff', 
         borderRight: isSidebarOpen ? '1px solid #e2e8f0' : 'none', 
@@ -416,6 +770,9 @@ const Dashboard = () => {
                             setActiveTab(item.id);
                             setBlogView('grid'); // reset to grid when clicking tabs
                             setUserView('grid');
+                            setEmployeeView('grid');
+                            setCustomerView('grid');
+                            setRoleView('grid');
                           }}
                           style={{
                             display: 'flex',
@@ -478,35 +835,47 @@ const Dashboard = () => {
       <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
         
         {/* Top Header Bar */}
-        <div style={{ height: '70px', backgroundColor: 'white', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '1.5rem', padding: '0 2rem', position: 'sticky', top: 0, zIndex: 10 }}>
-           <button 
-             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-             style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '0.5rem', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', transition: 'background-color 0.2s' }}
-             onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
-             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-           >
-             <FiMenu size={24} />
-           </button>
-           <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 500 }}>
-             <span style={{ color: '#cbd5e1' }}>Pages /</span> {getActiveTabLabel()}
-           </div>
-        </div>
+        {preferences.showHeader && (
+          <div style={{ height: '70px', backgroundColor: 'white', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '1.5rem', padding: '0 2rem', position: 'sticky', top: 0, zIndex: 10 }}>
+             <button 
+               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+               style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '0.5rem', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', transition: 'background-color 0.2s' }}
+               onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+               onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+             >
+               <FiMenu size={24} />
+             </button>
+             <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 500 }}>
+               <span style={{ color: '#cbd5e1' }}>Pages /</span> {getActiveTabLabel() || 'App Launcher'}
+             </div>
+          </div>
+        )}
 
         {/* Dynamic Content */}
         <div style={{ padding: '3rem', flex: 1 }}>
           <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-            {activeTab === 'blogs' ? (
+            {activeTab === 'launcher' ? (
+              <ModuleLauncher setActiveTab={setActiveTab} preferences={preferences} setPreferences={setPreferences} />
+            ) : activeTab === 'blogs' ? (
               blogView === 'grid' ? renderBlogGrid() : <BlogDataEntry blogId={editingBlogId} onClose={closeEditor} />
+            ) : activeTab === 'customers' ? (
+              customerView === 'editor' ? <CustomerDataEntry customerId={activeCustomerId} onClose={closeCustomerEditor} /> :
+              customerView === 'details' ? <CustomerDetails customerId={activeCustomerId} onClose={closeCustomerEditor} /> :
+              renderCustomerGrid()
             ) : activeTab === 'users' ? (
               userView === 'grid' ? renderUserGrid() : <UserDataEntry userId={editingUserId} onClose={closeUserEditor} />
-            ) : activeTab === 'dashboard' || activeTab === 'settings' ? (
-              <div style={{ textAlign: 'center', padding: '6rem 2rem', backgroundColor: 'white', borderRadius: '1rem', border: '1px dashed #cbd5e1' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem', color: '#cbd5e1' }}>
-                  {getActiveTabIcon()}
-                </div>
-                <h2 style={{ color: '#0f172a', marginBottom: '0.5rem' }}>{getActiveTabLabel()} Module</h2>
-                <p style={{ color: '#64748b' }}>This section is currently under construction and will be available soon.</p>
-              </div>
+            ) : activeTab === 'employees' ? (
+              employeeView === 'grid' ? renderEmployeeGrid() : <EmployeeDataEntry employeeId={editingEmployeeId} onClose={closeEmployeeEditor} />
+            ) : activeTab === 'mail_center' ? (
+              <MailCenter />
+            ) : activeTab === 'dashboard' ? (
+              <OverviewModule />
+            ) : activeTab === 'settings' ? (
+              <SettingsModule />
+            ) : activeTab === 'menus' ? (
+              <MenuConfigModule />
+            ) : activeTab === 'roles' ? (
+              roleView === 'grid' ? renderRoleGrid() : <RoleDataEntry roleId={editingRoleId} onClose={closeRoleEditor} />
             ) : (
               <GenericModule moduleKey={activeTab} />
             )}
@@ -514,8 +883,22 @@ const Dashboard = () => {
         </div>
 
       </div>
+      
+      {/* Global Full Screen Loader Overlay */}
+      {preferences.fullLoader && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ backgroundColor: 'white', padding: '2rem 3rem', borderRadius: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+            <div style={{ width: '40px', height: '40px', border: '4px solid #f1f5f9', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+            <span style={{ fontWeight: 600, color: '#1e293b' }}>Loading...</span>
+            <button onClick={() => setPreferences(prev => ({...prev, fullLoader: false}))} style={{ marginTop: '0.5rem', background: 'none', border: 'none', color: '#ef4444', fontSize: '0.875rem', cursor: 'pointer', textDecoration: 'underline' }}>Dismiss</button>
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Dashboard;
+
+

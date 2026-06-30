@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, CheckCircle, AlertCircle } from 'lucide-react';
+import { User, CheckCircle, AlertCircle, Save } from 'lucide-react';
 import { apiCall } from '../../utils/api';
 
 const CustomerProfile = ({ user }) => {
@@ -7,6 +7,8 @@ const CustomerProfile = ({ user }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleSave = async () => {
     setLoading(true);
@@ -37,63 +39,110 @@ const CustomerProfile = ({ user }) => {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-        <User size={32} color="#2563eb" />
-        <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>My Profile</h1>
+      <div style={{ marginBottom: '3rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ width: '48px', height: '48px', borderRadius: '1rem', background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)' }}>
+          <User size={24} color="white" />
+        </div>
+        <div>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, margin: '0 0 0.25rem 0', color: '#0f172a' }}>My Profile</h1>
+          <p style={{ margin: 0, color: '#64748b', fontSize: '1.05rem' }}>Update your personal details here.</p>
+        </div>
       </div>
       
-      <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0', padding: '2rem' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '500px' }}>
+      <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(10px)', borderRadius: '1.5rem', border: '1px solid white', padding: '3rem', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.05)', maxWidth: '600px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
           {error && (
-            <div style={{ padding: '1rem', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '0.5rem', border: '1px solid #fca5a5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <AlertCircle size={18} /> {error}
+            <div style={{ padding: '1.25rem', backgroundColor: 'rgba(254, 226, 226, 0.5)', color: '#dc2626', borderRadius: '1rem', border: '1px solid #fecaca', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 500 }}>
+              <AlertCircle size={20} /> {error}
             </div>
           )}
           
           {success && (
-            <div style={{ padding: '1rem', backgroundColor: '#dcfce7', color: '#166534', borderRadius: '0.5rem', border: '1px solid #86efac', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <CheckCircle size={18} /> {success}
+            <div style={{ padding: '1.25rem', backgroundColor: 'rgba(209, 250, 229, 0.5)', color: '#059669', borderRadius: '1rem', border: '1px solid #a7f3d0', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 500 }}>
+              <CheckCircle size={20} /> {success}
             </div>
           )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#475569' }}>Full Name</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <label style={{ fontSize: '0.95rem', fontWeight: 600, color: '#334155' }}>Full Name</label>
             <input 
               type="text" 
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', fontSize: '1rem' }} 
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              style={{ 
+                padding: '1rem 1.25rem', 
+                borderRadius: '0.75rem', 
+                border: isFocused ? '2px solid #8b5cf6' : '2px solid #e2e8f0', 
+                backgroundColor: isFocused ? 'white' : '#f8fafc',
+                fontSize: '1.05rem',
+                color: '#0f172a',
+                outline: 'none',
+                transition: 'all 0.2s ease',
+                boxShadow: isFocused ? '0 0 0 4px rgba(139, 92, 246, 0.1)' : 'none'
+              }} 
             />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#475569' }}>Email Address</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <label style={{ fontSize: '0.95rem', fontWeight: 600, color: '#334155' }}>Email Address</label>
             <input 
               type="email" 
               defaultValue={user?.email} 
               disabled
-              style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', color: '#94a3b8', fontSize: '1rem' }} 
+              style={{ 
+                padding: '1rem 1.25rem', 
+                borderRadius: '0.75rem', 
+                border: '2px solid #e2e8f0', 
+                backgroundColor: '#f1f5f9', 
+                color: '#94a3b8', 
+                fontSize: '1.05rem',
+                cursor: 'not-allowed'
+              }} 
             />
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Email cannot be changed directly. Contact support to update.</span>
+            <span style={{ fontSize: '0.85rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <AlertCircle size={14} /> Email cannot be changed directly. Contact support to update.
+            </span>
           </div>
 
           <button 
             onClick={handleSave}
-            disabled={loading || !fullName}
+            disabled={loading || !fullName || fullName === user?.full_name}
             style={{ 
-              padding: '0.75rem 1.5rem', 
-              backgroundColor: loading ? '#93c5fd' : '#2563eb', 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              padding: '1rem 2rem', 
+              background: (loading || !fullName || fullName === user?.full_name) ? '#cbd5e1' : 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)', 
               color: 'white', 
               border: 'none', 
-              borderRadius: '0.5rem', 
-              fontWeight: 600, 
-              cursor: loading ? 'not-allowed' : 'pointer', 
+              borderRadius: '2rem', 
+              fontWeight: 700, 
+              fontSize: '1.05rem',
+              cursor: (loading || !fullName || fullName === user?.full_name) ? 'not-allowed' : 'pointer', 
               alignSelf: 'flex-start', 
-              marginTop: '1rem' 
+              marginTop: '1rem',
+              transition: 'all 0.2s ease',
+              boxShadow: (loading || !fullName || fullName === user?.full_name) ? 'none' : '0 4px 15px rgba(139, 92, 246, 0.3)'
+            }}
+            onMouseOver={(e) => { 
+              if (!loading && fullName && fullName !== user?.full_name) {
+                e.currentTarget.style.transform = 'translateY(-2px)'; 
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(139, 92, 246, 0.4)';
+              }
+            }}
+            onMouseOut={(e) => { 
+              if (!loading && fullName && fullName !== user?.full_name) {
+                e.currentTarget.style.transform = 'translateY(0)'; 
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(139, 92, 246, 0.3)';
+              }
             }}
           >
-            {loading ? 'Saving...' : 'Save Changes'}
+            <Save size={20} />
+            {loading ? 'Saving Changes...' : 'Save Changes'}
           </button>
         </div>
       </div>

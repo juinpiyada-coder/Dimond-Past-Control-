@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, FileText } from 'lucide-react';
+import { CreditCard, FileText, CheckCircle, Clock } from 'lucide-react';
 import { apiCall } from '../../utils/api';
 
 const CustomerPayments = ({ user }) => {
@@ -50,56 +50,85 @@ const CustomerPayments = ({ user }) => {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <CreditCard size={32} color="#2563eb" />
-          <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>Payment History</h1>
+      <div style={{ marginBottom: '3rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ width: '48px', height: '48px', borderRadius: '1rem', background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)' }}>
+          <CreditCard size={24} color="white" />
+        </div>
+        <div>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, margin: '0 0 0.25rem 0', color: '#0f172a' }}>Payment History</h1>
+          <p style={{ margin: 0, color: '#64748b', fontSize: '1.05rem' }}>View past transactions and invoices.</p>
         </div>
       </div>
       
       {payments.length === 0 ? (
-        <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0', padding: '3rem', textAlign: 'center' }}>
-          <div style={{ width: '64px', height: '64px', backgroundColor: '#eff6ff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-            <FileText size={32} color="#3b82f6" />
+        <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', borderRadius: '1.5rem', border: '1px solid white', padding: '5rem 2rem', textAlign: 'center', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.05)' }}>
+          <div style={{ width: '80px', height: '80px', background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem', boxShadow: '0 4px 15px rgba(239, 68, 68, 0.1)' }}>
+            <FileText size={40} color="#ef4444" />
           </div>
-          <h3 style={{ fontSize: '1.25rem', color: '#0f172a', margin: '0 0 0.5rem 0' }}>No payment history</h3>
-          <p style={{ color: '#64748b', margin: '0' }}>You haven't made any payments yet.</p>
+          <h3 style={{ fontSize: '1.5rem', color: '#0f172a', margin: '0 0 0.75rem 0', fontWeight: 700 }}>No payment history</h3>
+          <p style={{ color: '#64748b', margin: '0', fontSize: '1.1rem' }}>You haven't made any payments yet.</p>
         </div>
       ) : (
-        <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-              <tr>
-                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600 }}>Payment ID</th>
-                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600 }}>Booking Ref</th>
-                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600 }}>Amount</th>
-                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600 }}>Method</th>
-                <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: 600 }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {payments.map((payment, index) => (
-                <tr key={payment.payment_id || index} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '1rem 1.5rem', color: '#0f172a', fontWeight: 500 }}>#{payment.payment_id}</td>
-                  <td style={{ padding: '1rem 1.5rem', color: '#64748b' }}>{payment.booking_reference}</td>
-                  <td style={{ padding: '1rem 1.5rem', color: '#0f172a', fontWeight: 600 }}>₹{Number(payment.amount || 0).toFixed(2)}</td>
-                  <td style={{ padding: '1rem 1.5rem', color: '#64748b', textTransform: 'uppercase' }}>{payment.payment_method || 'N/A'}</td>
-                  <td style={{ padding: '1rem 1.5rem' }}>
-                    <span style={{ 
-                      padding: '0.25rem 0.75rem', 
-                      backgroundColor: payment.payment_status === 'COMPLETED' ? '#dcfce7' : '#fef3c7', 
-                      color: payment.payment_status === 'COMPLETED' ? '#166534' : '#b45309', 
-                      borderRadius: '9999px', 
-                      fontSize: '0.75rem', 
-                      fontWeight: 600 
-                    }}>
-                      {payment.payment_status || 'PENDING'}
-                    </span>
-                  </td>
+        <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(10px)', borderRadius: '1.5rem', border: '1px solid white', overflow: 'hidden', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.05)' }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', backgroundColor: 'rgba(248, 250, 252, 0.5)' }}>
+                  <th style={{ padding: '1.25rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Payment ID</th>
+                  <th style={{ padding: '1.25rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Booking Ref</th>
+                  <th style={{ padding: '1.25rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Amount</th>
+                  <th style={{ padding: '1.25rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Method</th>
+                  <th style={{ padding: '1.25rem 1.5rem', color: '#475569', fontWeight: 600, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {payments.map((payment, index) => (
+                  <tr key={payment.payment_id || index} style={{ borderBottom: '1px solid rgba(0,0,0,0.03)', transition: 'background-color 0.2s' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <td style={{ padding: '1.25rem 1.5rem', color: '#0f172a', fontWeight: 700, fontSize: '1.05rem' }}>
+                      #{payment.payment_id}
+                    </td>
+                    <td style={{ padding: '1.25rem 1.5rem', color: '#64748b', fontWeight: 600 }}>
+                      {payment.booking_reference}
+                    </td>
+                    <td style={{ padding: '1.25rem 1.5rem', color: '#0f172a', fontWeight: 800, fontSize: '1.1rem' }}>
+                      ₹{Number(payment.amount || 0).toFixed(2)}
+                    </td>
+                    <td style={{ padding: '1.25rem 1.5rem' }}>
+                      <span style={{ 
+                        padding: '0.35rem 0.75rem', 
+                        backgroundColor: '#f1f5f9', 
+                        color: '#475569', 
+                        borderRadius: '0.5rem', 
+                        fontSize: '0.85rem', 
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.025em'
+                      }}>
+                        {payment.payment_method || 'CASH'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '1.25rem 1.5rem' }}>
+                      <span style={{ 
+                        padding: '0.35rem 0.75rem', 
+                        backgroundColor: payment.payment_status === 'COMPLETED' ? '#d1fae5' : '#fef3c7', 
+                        color: payment.payment_status === 'COMPLETED' ? '#059669' : '#d97706', 
+                        borderRadius: '2rem', 
+                        fontSize: '0.75rem', 
+                        fontWeight: 700,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        letterSpacing: '0.025em'
+                      }}>
+                        {payment.payment_status === 'COMPLETED' ? <CheckCircle size={14} /> : <Clock size={14} />}
+                        {payment.payment_status || 'PENDING'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

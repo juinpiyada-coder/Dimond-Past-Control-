@@ -2,11 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Mail, Phone, Lock, User as UserIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { apiCall } from '../utils/api';
+import { auth, googleProvider } from '../firebase';
+import { signInWithPopup } from 'firebase/auth';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [attempts, setAttempts] = useState(0);
@@ -95,8 +99,53 @@ const Auth = () => {
         setLoading(false);
       }
     } else {
-      // Sign up placeholder
-      setError('Sign up is not implemented yet. Please use login.');
+      setLoading(true);
+      try {
+        const response = await apiCall('/signup', 'POST', { 
+            full_name: fullName, 
+            email: email, 
+            phone: phone, 
+            password: password 
+        });
+        
+        setError('');
+        alert('Signup successful! Please login.');
+        setIsLogin(true);
+      } catch (err) {
+        setError(err.message || 'Signup failed');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const fbUser = result.user;
+      
+      const response = await apiCall('/google-auth', 'POST', {
+        uid: fbUser.uid,
+        email: fbUser.email,
+        full_name: fbUser.displayName || 'Google User'
+      });
+      
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      localStorage.setItem('loginAttempts', '0');
+      localStorage.removeItem('loginFreezeUntil');
+      
+      if (response.user.role.includes('ADMIN')) {
+        window.location.href = '/dashboard';
+      } else {
+        window.location.href = '/user-dashboard';
+      }
+    } catch (err) {
+      setError(err.message || 'Google Login failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -119,10 +168,16 @@ const Auth = () => {
 
         <form className="auth-form" onSubmit={handleAuth}>
           {!isLogin && (
-            <div className="form-group">
-              <label><UserIcon size={16} /> Full Name</label>
-              <input type="text" className="form-control" placeholder="John Doe" />
-            </div>
+            <>
+              <div className="form-group">
+                <label><UserIcon size={16} /> Full Name</label>
+                <input type="text" required className="form-control" placeholder="John Doe" value={fullName} onChange={(e) => setFullName(e.target.value)} disabled={freezeTimeLeft > 0} />
+              </div>
+              <div className="form-group">
+                <label><Phone size={16} /> Phone Number</label>
+                <input type="tel" required className="form-control" placeholder="1234567890" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={freezeTimeLeft > 0} />
+              </div>
+            </>
           )}
           
           <div className="form-group">
@@ -145,7 +200,7 @@ const Auth = () => {
         </div>
 
         <div className="social-login">
-          <button className="btn social-btn google-btn" disabled={freezeTimeLeft > 0}>
+          <button type="button" className="btn social-btn google-btn" disabled={freezeTimeLeft > 0 || loading} onClick={handleGoogleLogin}>
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" />
             Continue with Google
           </button>

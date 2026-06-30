@@ -121,6 +121,9 @@ const BookService = () => {
             image_data: formData.image_data
           });
         }
+        
+        alert('Booking created successfully! A confirmation email has been sent to your registered email address.');
+        
         // Redirect directly to the payment section
         navigate(`/payment?booking_id=${result.id}`);
       } else {
