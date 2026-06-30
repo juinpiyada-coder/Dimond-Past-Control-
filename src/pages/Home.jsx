@@ -112,6 +112,7 @@ const Home = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
+<<<<<<< HEAD
   const { data: reviews = [] } = useQuery({
     queryKey: ['reviews'],
     queryFn: async () => {
@@ -135,6 +136,8 @@ const Home = () => {
     staleTime: 5 * 60 * 1000,
   });
 
+=======
+>>>>>>> e45c416b136895de83fc4dbc9e1eabb2ebde712c
   const pestCategories = [
     { name: "Cockroaches", path: "cockroaches", icon: <FaBugs size={32} color="#2A329F" /> },
     { name: "Termites", path: "termites", icon: <FaBug size={32} color="#2A329F" /> },
@@ -361,6 +364,43 @@ const Home = () => {
 
       </div>
 
+<<<<<<< HEAD
+=======
+      {/* Inspection Section */}
+      <section className="inspection-section" style={{ padding: '60px 20px', background: 'linear-gradient(135deg, var(--secondary, #2A329F) 0%, #1e2475 100%)', color: 'white', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, right: 0, opacity: 0.1, transform: 'scale(1.5) translate(10%, -10%)' }}>
+          <Shield size={400} />
+        </div>
+        <div className="container" style={{ position: 'relative', zIndex: 1, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '30px' }}>
+          <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} style={{ flex: '1 1 500px' }}>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '15px', lineHeight: 1.2 }}>Need a Professional Pest Inspection?</h2>
+            <p style={{ fontSize: '1.1rem', opacity: 0.9, marginBottom: '25px', maxWidth: '600px', lineHeight: 1.6 }}>
+              Don't let pests take over your home or business. Schedule a comprehensive inspection with our experts today and get a customized treatment plan.
+            </p>
+            <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+              <Link to="/book" className="btn" style={{ backgroundColor: 'var(--primary, #FFEE00)', color: '#1e293b', fontWeight: 'bold', padding: '12px 25px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', border: 'none', cursor: 'pointer', transition: 'transform 0.2s', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }} onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+                <CheckCircle2 size={20} /> Book Free Inspection
+              </Link>
+              <Link to="/contact" className="btn" style={{ backgroundColor: 'transparent', color: 'white', fontWeight: 'bold', padding: '12px 25px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', border: '2px solid white', cursor: 'pointer', transition: 'all 0.2s' }} onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'white'; e.currentTarget.style.color = 'var(--secondary, #2A329F)'; }} onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'white'; }}>
+                <PhoneCall size={20} /> Contact Us Now
+              </Link>
+            </div>
+          </motion.div>
+          
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} style={{ flex: '1 1 300px', display: 'flex', justifyContent: 'center' }}>
+            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '30px', borderRadius: '20px', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', width: '100%', maxWidth: '400px' }}>
+              <h3 style={{ fontSize: '1.4rem', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: '10px' }}>What to expect?</h3>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}><Search size={24} color="var(--primary, #FFEE00)" style={{ flexShrink: 0, marginTop: '2px' }} /> <span>Thorough property assessment inside and out</span></li>
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}><Bug size={24} color="var(--primary, #FFEE00)" style={{ flexShrink: 0, marginTop: '2px' }} /> <span>Identification of pest types and entry points</span></li>
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}><Shield size={24} color="var(--primary, #FFEE00)" style={{ flexShrink: 0, marginTop: '2px' }} /> <span>Tailored protection plan and cost estimate</span></li>
+              </ul>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+>>>>>>> e45c416b136895de83fc4dbc9e1eabb2ebde712c
 
 
       {/* Custom Products Section */}

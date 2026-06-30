@@ -5,7 +5,10 @@ import { toast } from 'react-toastify';
 
 const CustomerDetails = ({ customerId, onClose }) => {
   const [customer, setCustomer] = useState(null);
+<<<<<<< HEAD
   const [guaranteeCards, setGuaranteeCards] = useState([]);
+=======
+>>>>>>> e45c416b136895de83fc4dbc9e1eabb2ebde712c
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,21 +19,29 @@ const CustomerDetails = ({ customerId, onClose }) => {
 
   const fetchCustomerDetails = async () => {
     try {
+<<<<<<< HEAD
       // Fetch user profile and guarantee cards
       const [data, cardsData] = await Promise.all([
         apiCall(`/users/${customerId}`),
         apiCall('/guarantee-cards')
       ]);
 
+=======
+      // Fetch user profile
+      const data = await apiCall(`/users/${customerId}`);
+>>>>>>> e45c416b136895de83fc4dbc9e1eabb2ebde712c
       if (data && !data.error) {
         setCustomer(data);
       } else {
         toast.error('Failed to fetch customer profile.');
       }
+<<<<<<< HEAD
 
       if (Array.isArray(cardsData)) {
         setGuaranteeCards(cardsData.filter(card => card.customer_id === customerId));
       }
+=======
+>>>>>>> e45c416b136895de83fc4dbc9e1eabb2ebde712c
     } catch (err) {
       toast.error(err.message || 'Error fetching customer data.');
     } finally {
@@ -145,6 +156,7 @@ const CustomerDetails = ({ customerId, onClose }) => {
 
         </div>
 
+<<<<<<< HEAD
         {/* Guarantee Cards Section */}
         <h3 style={{ margin: '2rem 0 1.5rem 0', color: '#1e293b', fontSize: '1.25rem', borderTop: '1px solid #e2e8f0', paddingTop: '2rem' }}>Guarantee Cards</h3>
         {guaranteeCards.length === 0 ? (
@@ -175,6 +187,8 @@ const CustomerDetails = ({ customerId, onClose }) => {
           </div>
         )}
 
+=======
+>>>>>>> e45c416b136895de83fc4dbc9e1eabb2ebde712c
       </div>
     </div>
   );

@@ -69,6 +69,7 @@ const ServiceDataEntry = ({ entityId, onClose }) => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
+<<<<<<< HEAD
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
@@ -99,6 +100,9 @@ const ServiceDataEntry = ({ entityId, onClose }) => {
           setFormData(prev => ({ ...prev, service_image: compressedDataUrl }));
         };
         img.src = reader.result;
+=======
+        setFormData(prev => ({ ...prev, service_image: reader.result }));
+>>>>>>> e45c416b136895de83fc4dbc9e1eabb2ebde712c
       };
       reader.readAsDataURL(file);
     }
